@@ -17,6 +17,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.google.android.flexbox.FlexboxLayout
 import com.lollipop.ldream.NotificationService
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author lollipop
@@ -38,6 +39,7 @@ class TimerHelper(private val timeView: TextView,
     var specialKeywordColor = Color.RED
     var isRunning = false
 
+    private val notificationList = ArrayList<NotificationService.Info>()
     private val context: Context
         get() = timeView.context
     private val handler = Handler(Looper.getMainLooper())
@@ -121,6 +123,7 @@ class TimerHelper(private val timeView: TextView,
         isRunning = true
         updateTimer()
         updateBattery()
+        initNotifications()
         context.registerReceiver(this, intentFilter)
     }
 
@@ -131,6 +134,13 @@ class TimerHelper(private val timeView: TextView,
         isRunning = false
         context.unregisterReceiver(this)
         handler.removeCallbacks(updateTask)
+    }
+
+    private fun initNotifications() {
+        val infos = NotificationService.getAllNotification()
+        notificationList.clear()
+        notificationList.addAll(infos)
+
     }
 
     fun onDestroy() {
