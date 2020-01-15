@@ -11,11 +11,17 @@ import android.os.Handler
 import android.os.Looper
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.drawable.IconCompat
 import com.google.android.flexbox.FlexboxLayout
 import com.lollipop.ldream.NotificationService
+import com.lollipop.ldream.R
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -38,10 +44,13 @@ class TimerHelper(private val timeView: TextView,
     var specialKeyword = "1"
     var specialKeywordColor = Color.RED
     var isRunning = false
+        private set
 
-    private val notificationList = ArrayList<NotificationService.Info>()
     private val context: Context
         get() = timeView.context
+    private val inflater: LayoutInflater by lazy {
+        LayoutInflater.from(context)
+    }
     private val handler = Handler(Looper.getMainLooper())
     private val tempBuilder = StringBuilder()
     private val calender = Calendar.getInstance()
@@ -53,7 +62,9 @@ class TimerHelper(private val timeView: TextView,
             addAction(ACTION_NOTIFICATION_REMOVED)
         }
     }
-    private val packageNames = ArrayList<String>()
+    private val notificationList = ArrayList<NotificationService.Info>()
+    private val notificationViewList = ArrayList<IconHolder>()
+    private val recycleViewList = LinkedList<IconHolder>()
 
     init {
         timeView.setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
@@ -137,14 +148,82 @@ class TimerHelper(private val timeView: TextView,
     }
 
     private fun initNotifications() {
-        val infos = NotificationService.getAllNotification()
+        val infoList = NotificationService.getAllNotification()
         notificationList.clear()
-        notificationList.addAll(infos)
+        notificationList.addAll(infoList)
+        if (notificationList.isEmpty()) {
+            for (holder in notificationViewList) {
+                val view = holder.view
+                val parent = view.parent
+                if (parent != null && parent is ViewGroup) {
+                    parent.removeView(view)
+                }
+            }
+            recycleViewList.addAll(notificationViewList)
+            notificationViewList.clear()
+        }
+        while (notificationViewList.size < notificationList.size) {
+            val holder = getIconHolder()
+            notificationGroup.addView(holder.view)
+            notificationViewList.add(holder)
+        }
+        while (notificationViewList.size > notificationList.size) {
+            recycleViewList.add(notificationViewList.removeAt(0))
+        }
+        for (i in notificationViewList.indices) {
+            notificationViewList[i].onBind(notificationList[i])
+        }
+    }
 
+    private fun onNotificationPosted(pkg: String, icon: IconCompat) {
+        if (TextUtils.isEmpty(pkg)) {
+            return
+        }
+        for (info in notificationList) {
+            if (pkg == info.pkg) {
+                return
+            }
+        }
+        val newInfo = NotificationService.Info(pkg, icon)
+        notificationList.add(newInfo)
+        val holder = getIconHolder()
+        notificationGroup.addView(holder.view)
+        notificationViewList.add(holder)
+        holder.onBind(newInfo)
+    }
+
+    private fun onNotificationRemoved(pkg: String) {
+        if (TextUtils.isEmpty(pkg)) {
+            return
+        }
+        for (info in notificationList) {
+            if (pkg == info.pkg) {
+                notificationList.remove(info)
+                break
+            }
+        }
+        for (holder in notificationViewList) {
+            if (pkg == holder.pkg) {
+                notificationViewList.remove(holder)
+                recycleViewList.add(holder)
+                notificationGroup.removeView(holder.view)
+                break
+            }
+        }
+    }
+
+    private fun getIconHolder(): IconHolder {
+        return if (recycleViewList.isNotEmpty()) {
+            recycleViewList.removeFirst()
+        } else {
+            IconHolder.getInstance(inflater, notificationGroup)
+        }
     }
 
     fun onDestroy() {
-
+        notificationViewList.clear()
+        recycleViewList.clear()
+        notificationList.clear()
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -156,9 +235,11 @@ class TimerHelper(private val timeView: TextView,
             ACTION_NOTIFICATION_POSTED -> {
                 val icon = intent.getNotificationIcon()?:return
                 val pkg = intent.getNotificationPkg()?:return
+                onNotificationPosted(pkg, icon)
             }
             ACTION_NOTIFICATION_REMOVED -> {
                 val pkg = intent.getNotificationPkg()?:return
+                onNotificationRemoved(pkg)
             }
         }
     }
@@ -169,6 +250,23 @@ class TimerHelper(private val timeView: TextView,
 
     private fun Intent.getNotificationPkg(): String? {
         return NotificationService.getPkg(this)
+    }
+
+    private class IconHolder private constructor(val view: View) {
+        companion object {
+            fun getInstance(inflater: LayoutInflater, viewGroup: ViewGroup): IconHolder {
+                return IconHolder(inflater.inflate(R.layout.notification_icon, viewGroup, false))
+            }
+        }
+        private val iconView = view.findViewById<ImageView>(R.id.iconView)
+
+        var pkg: String = ""
+
+        fun onBind(info: NotificationService.Info) {
+            pkg = info.pkg
+            iconView.setImageDrawable(info.icon.setTint(Color.WHITE).loadDrawable(view.context))
+        }
+
     }
 
 }
