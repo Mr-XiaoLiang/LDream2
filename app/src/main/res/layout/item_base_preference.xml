@@ -18,6 +18,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <ImageView
+        android:id="@+id/iconView"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="fitXY"
+        android:padding="4dp"
+        android:background="@drawable/bg_preference_icon"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/titleView"
+        app:layout_constraintBottom_toBottomOf="@id/summaryView"/>
+
     <TextView
         android:layout_width="0px"
         android:layout_height="wrap_content"
@@ -26,7 +38,9 @@
         android:textSize="18sp"
         android:layout_marginEnd="10dp"
         app:layout_goneMarginEnd="0dp"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="10dp"
+        app:layout_goneMarginStart="0dp"
+        app:layout_constraintLeft_toRightOf="@id/iconView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toLeftOf="@id/previewBody"/>
 
