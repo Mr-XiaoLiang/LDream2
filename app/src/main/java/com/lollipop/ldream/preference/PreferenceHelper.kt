@@ -30,6 +30,9 @@ class PreferenceHelper(private val group: RecyclerView,
                 is Float -> {
                     preference.putFloat(key, value)
                 }
+                is Double -> {
+                    preference.putFloat(key, value.toFloat())
+                }
                 is Long -> {
                     preference.putLong(key, value)
                 }
@@ -52,6 +55,9 @@ class PreferenceHelper(private val group: RecyclerView,
                             }
                         }
                     }
+                }
+                else -> {
+                    preference.putString(key, value.toString())
                 }
             }
             preference.apply()
