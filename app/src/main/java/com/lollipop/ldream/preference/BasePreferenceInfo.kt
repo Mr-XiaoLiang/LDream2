@@ -38,4 +38,23 @@ open class BasePreferenceInfo {
         return default as T
     }
 
+    fun putValue(context: Context, value: String) {
+        PreferenceHelper.put(context, key, value)
+    }
+    fun putValue(context: Context, value: Int) {
+        PreferenceHelper.put(context, key, value)
+    }
+    fun putValue(context: Context, value: Long) {
+        PreferenceHelper.put(context, key, value)
+    }
+    fun putValue(context: Context, value: Float) {
+        PreferenceHelper.put(context, key, value)
+    }
+    fun putValue(context: Context, value: Boolean) {
+        PreferenceHelper.put(context, key, value)
+    }
+    fun putValue(context: Context, value: Double) {
+        PreferenceHelper.put(context, key, value)
+    }
+
 }
