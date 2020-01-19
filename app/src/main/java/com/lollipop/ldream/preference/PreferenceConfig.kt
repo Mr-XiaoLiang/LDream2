@@ -1,0 +1,24 @@
+package com.lollipop.ldream.preference
+
+import android.graphics.Color
+import com.lollipop.ldream.util.changeAlpha
+
+
+/**
+ * @author lollipop
+ * @date 2020-01-18 20:08
+ * 偏好设置中的配置文件
+ */
+object PreferenceConfig {
+
+    const val titleSize = 18F
+
+    const val summarySize = 14F
+
+    const val titleColor = Color.WHITE
+
+    val summaryColor = titleColor.changeAlpha(0.8F)
+
+    const val iconColor = titleColor
+
+}

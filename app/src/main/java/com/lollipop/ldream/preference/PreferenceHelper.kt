@@ -2,7 +2,6 @@ package com.lollipop.ldream.preference
 
 import android.content.Context
 import android.util.ArraySet
-import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -92,9 +91,5 @@ class PreferenceHelper(private val group: RecyclerView,
 
     }
 
-    private class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo>,
-                                    private val layoutInflater: LayoutInflater) {
-
-    }
 
 }

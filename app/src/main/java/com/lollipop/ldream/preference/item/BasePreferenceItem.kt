@@ -1,5 +1,7 @@
-package com.lollipop.ldream.preference
+package com.lollipop.ldream.preference.item
 
+import android.content.res.ColorStateList
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,17 +11,25 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.ldream.R
+import com.lollipop.ldream.preference.PreferenceConfig
+import com.lollipop.ldream.preference.info.BasePreferenceInfo
 
 /**
  * @author lollipop
  * @date 2020-01-16 23:08
  * 基础的偏好设置项
  */
-open class BasePreferenceItem private constructor(view: View) :
+abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructor(view: View) :
     RecyclerView.ViewHolder(view),
     View.OnClickListener{
 
-    constructor(group: ViewGroup): this(createView(group))
+    abstract val widgetId: Int
+
+    constructor(group: ViewGroup): this(
+        createView(
+            group
+        )
+    )
 
     companion object {
         private fun createView(group: ViewGroup): View {
@@ -29,14 +39,25 @@ open class BasePreferenceItem private constructor(view: View) :
 
     private val titleView: TextView by lazy {
         itemView.setOnClickListener(this)
-        itemView.findViewById<TextView>(R.id.titleView)
+        itemView.findViewById<TextView>(R.id.titleView).apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP,
+                PreferenceConfig.titleSize
+            )
+            setTextColor(PreferenceConfig.titleColor)
+        }
     }
     private val summaryView: TextView by lazy {
-        itemView.findViewById<TextView>(R.id.summaryView)
+        itemView.findViewById<TextView>(R.id.summaryView).apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP,
+                PreferenceConfig.summarySize
+            )
+            setTextColor(PreferenceConfig.summaryColor)
+        }
     }
     private val iconView: ImageView by lazy {
         itemView.findViewById<ImageView>(R.id.iconView).apply {
             outlineProvider = ViewOutlineProvider.BACKGROUND
+            imageTintList = ColorStateList.valueOf(PreferenceConfig.iconColor)
         }
     }
     private val previewBody: FrameLayout by lazy {
@@ -45,7 +66,13 @@ open class BasePreferenceItem private constructor(view: View) :
         }
     }
 
-    protected fun bindPreview(view: View) {
+    fun init() {
+        if (widgetId != 0) {
+            bindPreview(widgetId)
+        }
+    }
+
+    private fun bindPreview(view: View) {
         if (previewBody.childCount > 0) {
             previewBody.removeAllViews()
         }
@@ -55,7 +82,7 @@ open class BasePreferenceItem private constructor(view: View) :
         previewBody.addView(view)
     }
 
-    protected fun bindPreview(layoutId: Int): View {
+    private fun bindPreview(layoutId: Int): View {
         val inflater = LayoutInflater.from(previewBody.context)
         val view = inflater.inflate(layoutId, previewBody, false)
         bindPreview(view)
@@ -63,10 +90,16 @@ open class BasePreferenceItem private constructor(view: View) :
     }
 
     protected fun setIcon(resId: Int) {
-        if (iconView.visibility != View.VISIBLE) {
-            iconView.visibility = View.VISIBLE
+        if (resId != 0) {
+            if (iconView.visibility != View.VISIBLE) {
+                iconView.visibility = View.VISIBLE
+            }
+            iconView.setImageResource(resId)
+        } else {
+            if (iconView.visibility != View.GONE) {
+                iconView.visibility = View.GONE
+            }
         }
-        iconView.setImageResource(resId)
     }
 
     protected open fun onPreviewClick(view: View) { }
@@ -89,13 +122,14 @@ open class BasePreferenceItem private constructor(view: View) :
             summaryView.text = value
         }
 
-    fun bind(info: BasePreferenceInfo) {
+    fun bind(info: T) {
         title = info.title
         summary = info.summary
+        setIcon(info.iconId)
         onBind(info)
     }
 
-    protected open fun onBind(info: BasePreferenceInfo) { }
+    protected open fun onBind(info: T) { }
 
     override fun onClick(v: View?) {
         when(v) {
