@@ -10,10 +10,10 @@ import com.lollipop.ldream.preference.item.BasePreferenceItem
  * @date 2020-01-18 20:32
  * 偏好设置的适配器
  */
-class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo>):
-    RecyclerView.Adapter<BasePreferenceItem>() {
+class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
+    RecyclerView.Adapter<BasePreferenceItem<*>>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
         return PreferenceFactory.createItem(parent,viewType)
     }
 
@@ -21,7 +21,7 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo>):
         return data.size
     }
 
-    override fun onBindViewHolder(holder: BasePreferenceItem, position: Int) {
+    override fun onBindViewHolder(holder: BasePreferenceItem<*>, position: Int) {
         PreferenceFactory.bindItem(holder, data[position])
     }
 
