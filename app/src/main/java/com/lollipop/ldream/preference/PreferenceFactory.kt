@@ -17,22 +17,30 @@ object PreferenceFactory {
     private const val Number = 1
     private const val Empty = 0
 
-    fun getInfoType(info: BasePreferenceInfo): Int {
+    fun getInfoType(info: BasePreferenceInfo<*>): Int {
         return when (info) {
             is NumberPreferenceInfo -> Number
             else -> Empty
         }
     }
 
-    fun createItem(group: ViewGroup, type: Int): BasePreferenceItem {
+    fun createItem(group: ViewGroup, type: Int): BasePreferenceItem<*> {
         return when(type) {
             Number -> NumberPreference(group)
             else -> EmptyPreferenceItem(group)
         }
     }
 
-    fun bindItem(item: BasePreferenceItem, info: BasePreferenceInfo) {
-        item.bind(info)
+    fun bindItem(item: BasePreferenceItem<*>, info: BasePreferenceInfo<*>) {
+        when (item) {
+            is NumberPreference -> if (info is NumberPreferenceInfo) {
+                item.bind(info)
+            }
+            is EmptyPreferenceItem -> {
+                item.bind(info)
+            }
+        }
+
     }
 
 }
