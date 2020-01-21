@@ -14,7 +14,9 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
     RecyclerView.Adapter<BasePreferenceItem<*>>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
-        return PreferenceFactory.createItem(parent,viewType)
+        val item = PreferenceFactory.createItem(parent,viewType)
+        item.init()
+        return item;
     }
 
     override fun getItemCount(): Int {

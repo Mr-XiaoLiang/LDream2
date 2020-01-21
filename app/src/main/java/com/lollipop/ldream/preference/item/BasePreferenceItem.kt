@@ -70,7 +70,10 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         if (widgetId != 0) {
             bindPreview(widgetId)
         }
+        onInit(itemView)
     }
+
+    protected open fun onInit(view: View) {}
 
     private fun bindPreview(view: View) {
         if (previewBody.childCount > 0) {

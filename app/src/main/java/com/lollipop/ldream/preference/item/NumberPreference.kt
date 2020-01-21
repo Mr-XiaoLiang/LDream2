@@ -1,6 +1,7 @@
 package com.lollipop.ldream.preference.item
 
 import android.view.ViewGroup
+import android.widget.TextView
 import com.lollipop.ldream.R
 import com.lollipop.ldream.preference.info.BasePreferenceInfo
 import com.lollipop.ldream.preference.info.NumberPreferenceInfo
@@ -15,6 +16,10 @@ class NumberPreference(viewGroup: ViewGroup): BasePreferenceItem<NumberPreferenc
 
     override val widgetId: Int
         get() = R.layout.preference_plugin_number
+
+    private val numberView: TextView by lazy {
+        itemView.findViewById<TextView>(R.id.numberView)
+    }
 
     override fun onBind(info: NumberPreferenceInfo) {
         super.onBind(info)
