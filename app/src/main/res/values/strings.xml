@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">LDream</string>
+    <string name="touch_view">Touch View</string>
 </resources>
