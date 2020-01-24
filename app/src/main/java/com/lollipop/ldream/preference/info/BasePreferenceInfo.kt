@@ -9,8 +9,7 @@ import com.lollipop.ldream.preference.value.PreferenceValue
  * @date 2020-01-16 23:43
  * 基础的偏好设置信息
  */
-open class BasePreferenceInfo<T: Any>(private val key: String,
-                                 private val default: T) {
+open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
     /**
      * 标题
      */
