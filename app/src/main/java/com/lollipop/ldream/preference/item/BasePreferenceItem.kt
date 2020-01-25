@@ -1,5 +1,6 @@
 package com.lollipop.ldream.preference.item
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -24,6 +25,19 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
     View.OnClickListener{
 
     abstract val widgetId: Int
+
+    protected val preferenceKey: String
+        get() {
+            return preferenceInfo?.key?:""
+        }
+
+    protected var preferenceInfo: T? = null
+        private set
+
+    protected val context: Context
+        get() {
+            return itemView.context
+        }
 
     constructor(group: ViewGroup): this(
         createView(
@@ -126,10 +140,15 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         }
 
     fun bind(info: T) {
+        preferenceInfo = info
         title = info.title
         summary = info.summary
         setIcon(info.iconId)
         onBind(info)
+    }
+
+    protected fun notifyInfoChange() {
+        preferenceInfo?.let { bind(it) }
     }
 
     protected open fun onBind(info: T) { }
