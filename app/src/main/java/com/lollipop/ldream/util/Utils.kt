@@ -10,7 +10,7 @@ import kotlin.math.min
  * 常见的工具方法
  */
 
-fun Int.changeAlpha(alpha: Int): Int {
+fun Int.changeAlpha(alpha: Int = 0x16): Int {
     val a = max(min(alpha, 255), 0) shl 24
     return this and 0xFFFFFF or a
 }
