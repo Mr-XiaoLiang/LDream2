@@ -2,15 +2,17 @@ package com.lollipop.ldream.preference
 
 import android.content.Context
 import android.util.ArraySet
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.ldream.preference.info.BasePreferenceInfo
+import com.lollipop.ldream.preference.info.NumberPreferenceInfo
 
 /**
  * @author lollipop
  * @date 2020-01-17 00:06
  * 偏好设置的辅助器
  */
-class PreferenceHelper(private val group: RecyclerView,
-                       private val key: String = "user") {
+class PreferenceHelper(private val group: RecyclerView) {
 
     companion object {
 
@@ -89,7 +91,60 @@ class PreferenceHelper(private val group: RecyclerView,
             return value as T
         }
 
+        fun findItemByKey(key: String, data: ArrayList<BasePreferenceInfo<*>>): BasePreferenceInfo<*>? {
+            for (info in data) {
+                if (info.key == key) {
+                    return info
+                }
+            }
+            return null
+        }
+
     }
 
+    private val context: Context
+        get() = group.context
+
+    private val data = ArrayList<BasePreferenceInfo<*>>()
+
+    private val adapter: PreferenceAdapter by lazy {
+        PreferenceAdapter(data)
+    }
+
+    private fun init() {
+        if (group.layoutManager == null) {
+            group.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        }
+        if (group.adapter == null) {
+            group.adapter = adapter
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+    fun addItem(vararg info: BasePreferenceInfo<*>) {
+        data.addAll(info)
+    }
+
+    fun removeItem(key: String) {
+        findItemByKey(key)?.let {
+            data.remove(it)
+        }
+    }
+
+    fun build(run: PreferenceHelper.() -> Unit) {
+        this.apply(run)
+        init()
+    }
+
+    fun number(key: String, run: NumberPreferenceInfo.() -> Unit): NumberPreferenceInfo {
+        if (findItemByKey(key) != null) {
+            throw RuntimeException("Already contains an item with the same key")
+        }
+        return NumberPreferenceInfo(key).apply(run)
+    }
+
+    private fun findItemByKey(key: String): BasePreferenceInfo<*>? {
+        return findItemByKey(key, data)
+    }
 
 }

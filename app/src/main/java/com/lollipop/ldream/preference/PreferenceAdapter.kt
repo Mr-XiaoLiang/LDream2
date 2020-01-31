@@ -1,9 +1,11 @@
 package com.lollipop.ldream.preference
 
+import android.text.TextUtils
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.ldream.preference.info.BasePreferenceInfo
 import com.lollipop.ldream.preference.item.BasePreferenceItem
+import com.lollipop.ldream.preference.item.StatusProvider
 
 /**
  * @author lollipop
@@ -15,8 +17,8 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
         val item = PreferenceFactory.createItem(parent,viewType)
-        item.init()
-        return item;
+        item.init{ getStatus(it) }
+        return item
     }
 
     override fun getItemCount(): Int {
@@ -25,6 +27,18 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
 
     override fun onBindViewHolder(holder: BasePreferenceItem<*>, position: Int) {
         PreferenceFactory.bindItem(holder, data[position])
+    }
+
+    private fun getStatus(info: BasePreferenceInfo<*>): Boolean {
+        if (TextUtils.isEmpty(info.relevantKey)) {
+            return info.enable
+        }
+        val relevantInfo = PreferenceHelper.findItemByKey(info.relevantKey, data) ?: return info.enable
+        return if (relevantInfo is StatusProvider) {
+            relevantInfo.statusValue == info.relevantEnable
+        } else {
+            info.enable
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

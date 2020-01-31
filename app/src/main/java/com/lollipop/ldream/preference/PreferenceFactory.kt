@@ -40,7 +40,6 @@ object PreferenceFactory {
                 item.bind(info)
             }
         }
-
     }
 
 }

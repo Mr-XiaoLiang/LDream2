@@ -25,12 +25,27 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
      */
     var iconId: Int = 0
 
+    /**
+     * 是否启用
+     */
+    var enable = true
+
+    /**
+     * 关注的对象
+     */
+    var relevantKey = ""
+    /**
+     * 关注的结果
+     */
+    var relevantEnable = true
+
     @Suppress("UNCHECKED_CAST")
     fun getValue(context: Context): T {
-        when (default) {
+        return when (default) {
             is PreferenceValue -> {
                 default.parse(PreferenceHelper.get(
                     context, key, default.serialization()))
+                default
             }
             is String -> {
                 PreferenceHelper.get(context, key, default)
@@ -54,8 +69,7 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
                 throw RuntimeException("Unknown value type, " +
                         "please Implementing the PreferenceValue interface")
             }
-        }
-        return default
+        } as T
     }
 
     fun putValue(context: Context, value: T) {

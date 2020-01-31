@@ -39,6 +39,11 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
             return itemView.context
         }
 
+    protected var isEnable: Boolean = true
+        private set
+
+    private var relevantStatusCallback: ((BasePreferenceInfo<*>) -> Boolean)? = null
+
     constructor(group: ViewGroup): this(
         createView(
             group
@@ -47,7 +52,8 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
 
     companion object {
         private fun createView(group: ViewGroup): View {
-            return LayoutInflater.from(group.context).inflate(R.layout.item_base_preference, group)
+            return LayoutInflater.from(group.context).inflate(R.layout.item_base_preference,
+                group, false)
         }
     }
 
@@ -60,6 +66,7 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
             setTextColor(PreferenceConfig.titleColor)
         }
     }
+
     private val summaryView: TextView by lazy {
         itemView.findViewById<TextView>(R.id.summaryView).apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP,
@@ -80,7 +87,8 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         }
     }
 
-    fun init() {
+    fun init(relevantCallback: (BasePreferenceInfo<*>) -> Boolean) {
+        this.relevantStatusCallback = relevantCallback
         if (widgetId != 0) {
             bindPreview(widgetId)
         }
@@ -145,6 +153,7 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         summary = info.summary
         setIcon(info.iconId)
         onBind(info)
+        checkItemStatus(relevantStatusCallback?.invoke(info)?:true)
     }
 
     protected fun notifyInfoChange() {
@@ -153,7 +162,28 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
 
     protected open fun onBind(info: T) { }
 
+    private fun checkItemStatus(isEnable: Boolean) {
+        this.isEnable = isEnable
+        itemView.isEnabled = isEnable
+        titleView.setStatus(isEnable)
+        summaryView.setStatus(isEnable)
+        onStatusChange(isEnable)
+    }
+
+    protected fun View.setStatus(isEnable: Boolean) {
+        this.alpha = if (isEnable) {
+            1F
+        } else {
+            0.5F
+        }
+    }
+
+    protected open fun onStatusChange(isEnable: Boolean) {}
+
     override fun onClick(v: View?) {
+        if (!isEnable) {
+            return
+        }
         when(v) {
             itemView -> {
                 onItemClick(v)

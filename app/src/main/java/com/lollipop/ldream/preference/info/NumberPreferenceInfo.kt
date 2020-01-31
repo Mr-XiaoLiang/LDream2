@@ -5,6 +5,4 @@ package com.lollipop.ldream.preference.info
  * @date 2020-01-18 20:38
  * 数字偏好设置
  */
-class NumberPreferenceInfo(key: String): BasePreferenceInfo<String>(key, "0") {
-
-}
+class NumberPreferenceInfo(key: String): BasePreferenceInfo<Int>(key, 0)
