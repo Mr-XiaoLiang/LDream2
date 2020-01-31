@@ -24,6 +24,8 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
     RecyclerView.ViewHolder(view),
     View.OnClickListener{
 
+    private var isInit = false
+
     abstract val widgetId: Int
 
     protected val preferenceKey: String
@@ -42,7 +44,15 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
     protected var isEnable: Boolean = true
         private set
 
-    private var relevantStatusCallback: ((BasePreferenceInfo<*>) -> Boolean)? = null
+    private var relevantStatusCallback: ((Int) -> Boolean)? = null
+
+    private var preferenceChangeCallback: ((Int) -> Unit)? = null
+
+    private val notifyItemChangeTask: Runnable by lazy {
+        Runnable {
+            preferenceChangeCallback?.invoke(adapterPosition)
+        }
+    }
 
     constructor(group: ViewGroup): this(
         createView(
@@ -87,8 +97,14 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         }
     }
 
-    fun init(relevantCallback: (BasePreferenceInfo<*>) -> Boolean) {
+    fun init(relevantCallback: (Int) -> Boolean,
+             applyCallback: (Int) -> Unit) {
+        if (isInit) {
+            return
+        }
+        isInit = true
         this.relevantStatusCallback = relevantCallback
+        this.preferenceChangeCallback = applyCallback
         if (widgetId != 0) {
             bindPreview(widgetId)
         }
@@ -135,7 +151,7 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         get() {
             return titleView.text
         }
-        set(value) {
+        private set(value) {
             titleView.text = value
         }
 
@@ -153,11 +169,12 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         summary = info.summary
         setIcon(info.iconId)
         onBind(info)
-        checkItemStatus(relevantStatusCallback?.invoke(info)?:true)
+        checkItemStatus(relevantStatusCallback?.invoke(adapterPosition)?:true)
     }
 
     protected fun notifyInfoChange() {
         preferenceInfo?.let { bind(it) }
+        applyChange()
     }
 
     protected open fun onBind(info: T) { }
@@ -168,6 +185,11 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         titleView.setStatus(isEnable)
         summaryView.setStatus(isEnable)
         onStatusChange(isEnable)
+    }
+
+    protected fun applyChange() {
+        itemView.removeCallbacks(notifyItemChangeTask)
+        itemView.postDelayed(notifyItemChangeTask, 50)
     }
 
     protected fun View.setStatus(isEnable: Boolean) {
