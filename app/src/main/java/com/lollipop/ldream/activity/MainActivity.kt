@@ -1,9 +1,10 @@
 package com.lollipop.ldream.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
+import com.lollipop.ldream.preference.PreferenceHelper
 import com.lollipop.ldream.util.TimerHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
@@ -11,6 +12,7 @@ import kotlinx.android.synthetic.main.content_timer.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var timerHelper: TimerHelper
+    private lateinit var preferenceHelper: PreferenceHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +20,15 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         timerHelper = TimerHelper(timerView, notificationGroup, powerView)
+        preferenceHelper = PreferenceHelper(preferenceList)
+        preferenceHelper.build {
+            addItem(
+                number("keyWorld") {
+                    title = "关键字"
+                    summary = "设置关键字"
+                }
+            )
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

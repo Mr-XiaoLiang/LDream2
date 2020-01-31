@@ -2,6 +2,7 @@ package com.lollipop.ldream.util
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -83,7 +84,7 @@ class CardWheelDialogFragment private constructor(): BottomSheetDialogFragment()
                 }
                 if (state == ScrollState.IDLE) {
                     selectedIndex = position
-                    if (selectedIndex != 0 && isViewCreated && isTouched) {
+                    if (selectedIndex >= 0 && isViewCreated && isTouched) {
                         onSelectedListener?.onCardSelected(dataList[selectedIndex])
                     }
                 }
@@ -144,5 +145,6 @@ class CardWheelDialogFragment private constructor(): BottomSheetDialogFragment()
         }
 
     }
+
 
 }

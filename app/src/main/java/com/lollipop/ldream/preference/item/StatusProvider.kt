@@ -5,4 +5,7 @@ package com.lollipop.ldream.preference.item
  * @date 2020-01-29 18:52
  */
 interface StatusProvider {
+
+    val statusValue: Boolean
+
 }
