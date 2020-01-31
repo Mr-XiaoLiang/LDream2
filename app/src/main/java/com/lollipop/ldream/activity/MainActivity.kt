@@ -21,6 +21,12 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         timerHelper = TimerHelper(timerView, notificationGroup, powerView)
         preferenceHelper = PreferenceHelper(preferenceList)
+        preferenceList.post {
+            initPreference()
+        }
+    }
+
+    private fun initPreference() {
         preferenceHelper.build {
             addItem(
                 number("keyWorld") {
