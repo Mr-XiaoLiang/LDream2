@@ -17,7 +17,10 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
         val item = PreferenceFactory.createItem(parent,viewType)
-        item.init{ getStatus(it) }
+        item.init(
+            { getStatus(data[it]) },
+            { checkItemStatus(data[it]) }
+        )
         return item
     }
 
@@ -38,6 +41,26 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
             relevantInfo.statusValue == info.relevantEnable
         } else {
             info.enable
+        }
+    }
+
+    private fun checkItemStatus(info: BasePreferenceInfo<*>) {
+        if (TextUtils.isEmpty(info.key)) {
+            return
+        }
+        if (info !is StatusProvider) {
+            return
+        }
+        val statusValue = info.statusValue
+        for (index in data.indices) {
+            val item = data[index]
+            if (item == info) {
+                continue
+            }
+            if (item.relevantKey == info.key) {
+                item.enable = item.relevantEnable == statusValue
+            }
+            notifyItemChanged(index)
         }
     }
 
