@@ -1,9 +1,11 @@
 package com.lollipop.ldream.preference
 
 import android.content.Context
+import android.content.Intent
 import android.util.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.ldream.preference.info.ActionPreferenceInfo
 import com.lollipop.ldream.preference.info.BasePreferenceInfo
 import com.lollipop.ldream.preference.info.NumberPreferenceInfo
 
@@ -137,10 +139,20 @@ class PreferenceHelper(private val group: RecyclerView) {
     }
 
     fun number(key: String, run: NumberPreferenceInfo.() -> Unit): NumberPreferenceInfo {
+        checkItem(key)
+        return NumberPreferenceInfo(key).apply(run)
+    }
+
+    fun action(key: String, action: Intent,
+               run: ActionPreferenceInfo.() -> Unit): ActionPreferenceInfo {
+        checkItem(key)
+        return ActionPreferenceInfo(key, action).apply(run)
+    }
+
+    private fun checkItem(key: String) {
         if (findItemByKey(key) != null) {
             throw RuntimeException("Already contains an item with the same key")
         }
-        return NumberPreferenceInfo(key).apply(run)
     }
 
     private fun findItemByKey(key: String): BasePreferenceInfo<*>? {
