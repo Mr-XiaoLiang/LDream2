@@ -6,8 +6,8 @@ import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
-import com.lollipop.ldream.preference.PreferenceHelper
 import com.lollipop.ldream.util.TimerHelper
+import com.lollipop.lpreference.PreferenceHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
