@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="preference_title">16sp</dimen>
+    <dimen name="preference_summary">14sp</dimen>
+</resources>

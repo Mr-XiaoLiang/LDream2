@@ -11,10 +11,6 @@ import com.lollipop.ldream.util.changeAlpha
  */
 object PreferenceConfig {
 
-    const val titleSize = 18F
-
-    const val summarySize = 14F
-
     const val titleColor = Color.WHITE
 
     val summaryColor = titleColor.changeAlpha(0.8F)
