@@ -38,6 +38,12 @@ class MainActivity : AppCompatActivity() {
                 action("action", Intent(Settings.ACTION_SETTINGS)) {
                     title = "跳转到设置"
                     summary = "跳转到设置页面"
+                },
+                switch("switch") {
+                    title = "开关"
+                    summary = "打开或者关闭开关"
+                    summaryTrue = "你已经打开了开关"
+                    summaryFalse = "你已经关闭了开关"
                 }
             )
         }

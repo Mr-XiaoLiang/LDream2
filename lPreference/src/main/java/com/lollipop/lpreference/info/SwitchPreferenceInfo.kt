@@ -5,4 +5,13 @@ package com.lollipop.lpreference.info
  * @date 2020-01-18 20:38
  * 开关的偏好设置
  */
-class SwitchPreferenceInfo(key: String): BasePreferenceInfo<Boolean>(key, false)
+class SwitchPreferenceInfo(key: String): BasePreferenceInfo<Boolean>(key, false) {
+    /**
+     * 开启状态下的描述内容
+     */
+    var summaryTrue = ""
+    /**
+     * 关闭状态下的描述信息
+     */
+    var summaryFalse = ""
+}
