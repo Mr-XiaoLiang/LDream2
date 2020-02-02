@@ -2,7 +2,6 @@ package com.lollipop.ldream.preference.item
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,18 +69,12 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
     private val titleView: TextView by lazy {
         itemView.setOnClickListener(this)
         itemView.findViewById<TextView>(R.id.titleView).apply {
-            setTextSize(TypedValue.COMPLEX_UNIT_SP,
-                PreferenceConfig.titleSize
-            )
             setTextColor(PreferenceConfig.titleColor)
         }
     }
 
     private val summaryView: TextView by lazy {
         itemView.findViewById<TextView>(R.id.summaryView).apply {
-            setTextSize(TypedValue.COMPLEX_UNIT_SP,
-                PreferenceConfig.summarySize
-            )
             setTextColor(PreferenceConfig.summaryColor)
         }
     }

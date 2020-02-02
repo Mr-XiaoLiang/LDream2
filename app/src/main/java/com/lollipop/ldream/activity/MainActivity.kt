@@ -1,6 +1,8 @@
 package com.lollipop.ldream.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
@@ -32,6 +34,10 @@ class MainActivity : AppCompatActivity() {
                 number("keyWorld") {
                     title = "关键字"
                     summary = "设置关键字"
+                },
+                action("action", Intent(Settings.ACTION_SETTINGS)) {
+                    title = "跳转到设置"
+                    summary = "跳转到设置页面"
                 }
             )
         }
