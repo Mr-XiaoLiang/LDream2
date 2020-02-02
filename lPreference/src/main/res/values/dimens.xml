@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="preference_title">15sp</dimen>
+    <dimen name="preference_summary">13sp</dimen>
+</resources>
