@@ -2,12 +2,14 @@ package com.lollipop.lpreference
 
 import android.content.Context
 import android.content.Intent
+import android.text.TextUtils
 import android.util.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.info.ActionPreferenceInfo
 import com.lollipop.lpreference.info.BasePreferenceInfo
 import com.lollipop.lpreference.info.NumberPreferenceInfo
+import com.lollipop.lpreference.info.SwitchPreferenceInfo
 
 /**
  * @author lollipop
@@ -19,6 +21,9 @@ class PreferenceHelper(private val group: RecyclerView) {
     companion object {
 
         inline fun <reified T> put(context: Context, key: String, value: T) {
+            if (TextUtils.isEmpty(key)) {
+                return
+            }
             val preference = context.getSharedPreferences(key, Context.MODE_PRIVATE).edit()
             when (value) {
                 is String -> {
@@ -68,6 +73,9 @@ class PreferenceHelper(private val group: RecyclerView) {
 
         @Suppress("UNCHECKED_CAST")
         inline fun <reified T> get(context: Context, key: String, def: T): T {
+            if (TextUtils.isEmpty(key)) {
+                return def
+            }
             val preference = context.getSharedPreferences(key, Context.MODE_PRIVATE)
             val value = when (def) {
                 is String -> {
@@ -147,6 +155,11 @@ class PreferenceHelper(private val group: RecyclerView) {
                run: ActionPreferenceInfo.() -> Unit): ActionPreferenceInfo {
         checkItem(key)
         return ActionPreferenceInfo(key, action).apply(run)
+    }
+
+    fun switch(key: String, run: SwitchPreferenceInfo.() -> Unit): SwitchPreferenceInfo {
+        checkItem(key)
+        return SwitchPreferenceInfo(key).apply(run)
     }
 
     private fun checkItem(key: String) {
