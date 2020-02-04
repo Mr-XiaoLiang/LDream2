@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.info.NumberPreferenceInfo
-import com.lollipop.lpreference.util.CardWheelDialogFragment
+import com.lollipop.lpreference.dialog.CardWheelDialogFragment
 import com.lollipop.lpreference.util.range
 
 /**
