@@ -5,6 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ImageView
 import kotlin.math.max
 import kotlin.math.min
@@ -32,6 +33,11 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
         event?:return super.onTouchEvent(event)
         return when(event.action){
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    if (parent is ViewGroup) {
+                        parent.requestDisallowInterceptTouchEvent(true)
+                    }
+                }
                 val alpha = transparencyPaletteDrawable.selectTo(event.x)
                 transparencyCallback?.onTransparencySelect(alpha, (alpha * 255).toInt())
                 true
@@ -68,6 +74,8 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
             color = Color.BLACK
         }
 
+        private val arrowPath = Path()
+
         override fun draw(canvas: Canvas) {
             val gridWidth = bounds.height() * 1F / spanY
             val spanX = (bounds.width() / gridWidth).toInt()
@@ -95,6 +103,11 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
             paint.color = Color.WHITE
             left = selectedAlpha * bounds.width() + bounds.left
             canvas.drawLine(left, bounds.top.toFloat(), left, bounds.bottom.toFloat(), paint)
+
+            canvas.save()
+            canvas.translate(left, 0F)
+            canvas.drawPath(arrowPath, paint)
+            canvas.restore()
         }
 
         fun parser(alphaF: Float) {
@@ -120,6 +133,20 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
             alphaShader = LinearGradient(bounds.left.toFloat(), bounds.top.toFloat(),
                 bounds.right.toFloat(), bounds.top.toFloat(),
                 Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP)
+
+            arrowPath.reset()
+            val height = bounds.height() * 1F
+            val w = height / 10
+            arrowPath.moveTo(-w, 0F)
+            arrowPath.lineTo(w, 0F)
+            arrowPath.lineTo(0F, w * 2)
+            arrowPath.lineTo(-w, 0F)
+
+            arrowPath.moveTo(-w, height)
+            arrowPath.lineTo(w, height)
+            arrowPath.lineTo(0F, height - w * 2)
+            arrowPath.lineTo(-w, height)
+
             invalidateSelf()
         }
 

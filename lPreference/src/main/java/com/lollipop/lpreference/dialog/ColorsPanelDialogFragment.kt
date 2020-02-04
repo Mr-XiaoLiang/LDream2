@@ -2,6 +2,7 @@ package com.lollipop.lpreference.dialog
 
 
 import android.content.Context
+import android.os.Bundle
 import com.lollipop.lpreference.R
 
 /**
@@ -20,5 +21,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog() {
 
     override val contextId: Int
         get() = R.layout.fragment_colors_panel_dialog
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
 }
