@@ -1,10 +1,12 @@
 package com.lollipop.lpreference.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ImageView
 
 /**
@@ -25,24 +27,24 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         setImageDrawable(hueDrawable)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-
-        if(event == null){
-            return super.onTouchEvent(event)
-        }
-
+        event?:return super.onTouchEvent(event)
         return when(event.action){
 
             MotionEvent.ACTION_DOWN,MotionEvent.ACTION_MOVE,MotionEvent.ACTION_UP -> {
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    if (parent is ViewGroup) {
+                        parent.requestDisallowInterceptTouchEvent(true)
+                    }
+                }
                 val hue = hueDrawable.selectTo(event.y)
                 hueCallback?.onHueSelect(hue)
                 true
             }
-
             else -> {
                 super.onTouchEvent(event)
             }
-
         }
     }
 
@@ -66,8 +68,11 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             isDither = true
             isAntiAlias = true
             color = Color.WHITE
+            strokeWidth = 1F
         }
         private var selectHue = 0
+
+        private val arrowPath = Path()
 
         init {
             for((count, i) in ((hueColor.size-1) downTo 0).withIndex()){
@@ -80,19 +85,36 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             val selectY = getSelectY()
             canvas.drawLine(bounds.left.toFloat(),selectY,
                 bounds.right.toFloat(),selectY,linePaint)
+            canvas.save()
+            canvas.translate(0F, selectY)
+            canvas.drawPath(arrowPath, linePaint)
+            canvas.restore()
         }
 
         override fun onBoundsChange(bounds: Rect?) {
             super.onBoundsChange(bounds)
-            if(bounds==null){
-                return
-            }
+            bounds?:return
+
             val hueShader = LinearGradient(
                 bounds.left.toFloat(),bounds.top.toFloat(),
                 bounds.left.toFloat(),bounds.bottom.toFloat(),
                 hueColor,null,Shader.TileMode.CLAMP)
 
             paint.shader = hueShader
+
+            arrowPath.reset()
+            val width = bounds.width() * 1F
+            val h = width / 10
+            arrowPath.moveTo(0F, -h)
+            arrowPath.lineTo(0F, h)
+            arrowPath.lineTo(h * 2, 0F)
+            arrowPath.lineTo(0F, -h)
+
+            arrowPath.moveTo(width, -h)
+            arrowPath.lineTo(width, h)
+            arrowPath.lineTo(width - h * 2, 0F)
+            arrowPath.lineTo(width, -h)
+
             invalidateSelf()
         }
 

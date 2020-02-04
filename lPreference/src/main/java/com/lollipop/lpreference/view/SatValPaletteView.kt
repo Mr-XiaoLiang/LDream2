@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ImageView
 
 /**
@@ -41,6 +42,11 @@ class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         return when (event.action) {
 
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    if (parent is ViewGroup) {
+                        parent.requestDisallowInterceptTouchEvent(true)
+                    }
+                }
                 val hsv = satValPaletteDrawable.selectTo(event.x, event.y)
                 hsvCallback?.onHSVSelect(hsv, Color.HSVToColor(hsv))
                 true
