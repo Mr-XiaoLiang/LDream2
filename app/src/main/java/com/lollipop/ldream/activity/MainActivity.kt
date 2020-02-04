@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
 import com.lollipop.ldream.util.TimerHelper
 import com.lollipop.lpreference.PreferenceHelper
+import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
@@ -52,7 +53,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+//                onBackPressed()
+                ColorsPanelDialogFragment.show(this)
                 return true
             }
         }
