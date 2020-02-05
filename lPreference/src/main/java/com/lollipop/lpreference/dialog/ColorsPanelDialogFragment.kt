@@ -1,16 +1,12 @@
 package com.lollipop.lpreference.dialog
 
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewPropertyAnimator
-import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.widget.ViewAnimator
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
 import com.lollipop.lpreference.view.HuePaletteView
@@ -43,6 +39,8 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     private var colorRGB = Color.RED
     private var colorAlpha = 255
 
+    var isChecked = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         huePalette.hueCallback = this
@@ -51,6 +49,11 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         definiteBtn.setOnClickListener(this)
         selectedColor(colorRGB)
 
+        colorView.setColor(Color.RED)
+        colorView.setOnClickListener {
+            isChecked = !isChecked
+            colorView.setChecked(isChecked, "99+", false)
+        }
     }
 
     private fun selectedColor(color: Int) {
@@ -86,6 +89,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     }
 
     private fun openPalette() {
+        if (!palettePanel.isPortrait()) {
+            return
+        }
         if (palettePanel.translationX < 1) {
             palettePanel.translationX = palettePanel.width * 1F
         }
@@ -118,6 +124,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     }
 
     private fun closePalette() {
+        if (!palettePanel.isPortrait()) {
+            return
+        }
         palettePanel.animate().let { animator ->
             animator.cancel()
             changeInterpolator(animator)

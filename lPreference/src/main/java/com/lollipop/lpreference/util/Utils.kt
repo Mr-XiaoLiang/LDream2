@@ -1,5 +1,7 @@
 package com.lollipop.lpreference.util
 
+import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -53,4 +55,12 @@ fun Int.toHexString(digit: Int = 2): String {
         builder.insert(0, "0")
     }
     return builder.toString().toUpperCase(Locale.US)
+}
+
+fun Context.isPortrait(): Boolean {
+    return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+}
+
+fun View.isPortrait(): Boolean {
+    return context.isPortrait()
 }
