@@ -5,6 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.widget.TextView
 import kotlin.math.min
 
@@ -27,6 +28,8 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         }
         background = backgroundDrawable
     }
+
+    var contextWeight = 0.7F
 
     fun setStatusColor(color:Int){
         backgroundDrawable.setColor(color)
@@ -82,6 +85,38 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             invalidateSelf()
         }
 
+    }
+
+    fun setAutoValue(value: String) {
+        if (value.isNotEmpty()) {
+            val contentWidth = (width * 1F - paddingLeft - paddingRight) * contextWeight
+            val fontSize = refitText(contentWidth, value)
+            val contentHeight = (height * 1F - paddingTop - paddingBottom) * contextWeight
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, min(fontSize, contentHeight))
+        }
+        text = value
+    }
+
+    private fun refitText(targetWidth: Float, text: String): Float {
+        if (text.isEmpty()) {
+            return 1F
+        }
+        val threshold = 0.5f
+        val textPaint = paint
+        var preferredTextSize = targetWidth
+        var minTextSize = 1F
+        while (preferredTextSize - minTextSize > threshold) {
+            val size = (preferredTextSize + minTextSize) / 2
+            textPaint.textSize = size
+            if (textPaint.measureText(text) >= targetWidth) {
+                // too big
+                preferredTextSize = size
+            } else {
+                // too small
+                minTextSize = size
+            }
+        }
+        return minTextSize
     }
 
 }
