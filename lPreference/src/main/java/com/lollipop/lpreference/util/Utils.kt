@@ -1,6 +1,9 @@
 package com.lollipop.lpreference.util
 
 import android.graphics.Color
+import android.view.View
+import androidx.core.content.ContextCompat
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,4 +32,25 @@ fun Int.range(min: Int, max: Int): Int {
         return max
     }
     return this
+}
+
+fun View.getColor(id: Int): Int {
+    return ContextCompat.getColor(context, id)
+}
+
+fun Int.colorValue(): String {
+    var result = "#"
+    result += Color.alpha(this).toHexString()
+    result += Color.red(this).toHexString()
+    result += Color.green(this).toHexString()
+    result += Color.blue(this).toHexString()
+    return result
+}
+
+fun Int.toHexString(digit: Int = 2): String {
+    val builder = StringBuilder(Integer.toHexString(this))
+    while (builder.length < digit) {
+        builder.insert(0, "0")
+    }
+    return builder.toString().toUpperCase(Locale.US)
 }

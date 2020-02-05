@@ -7,15 +7,18 @@
     tools:context=".dialog.ColorsPanelDialogFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/color"
+        android:id="@+id/colorPoolView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/palettePanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:background="@color/T3">
+        android:elevation="20dp"
+        android:background="@color/T3"
+        android:visibility="invisible">
         <com.lollipop.lpreference.view.TransparencyPaletteView
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -51,6 +54,22 @@
             android:layout_width="0px"
             android:layout_height="0px"
             android:layout_marginEnd="10dp" />
+
+        <com.lollipop.lpreference.view.CirclePointView
+            android:id="@+id/colorValueView"
+            android:textColor="@android:color/white"
+            android:background="#8000"
+            android:text="#88000000"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/previewColorView"
+            app:layout_constraintRight_toRightOf="@id/previewColorView"
+            app:layout_constraintTop_toTopOf="@id/previewColorView"
+            android:layout_width="wrap_content"
+            android:layout_height="0px"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
