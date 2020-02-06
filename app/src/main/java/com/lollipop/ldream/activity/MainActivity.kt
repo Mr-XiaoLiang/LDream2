@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
 import com.lollipop.ldream.util.TimerHelper
@@ -54,7 +55,9 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             android.R.id.home -> {
 //                onBackPressed()
-                ColorsPanelDialogFragment.show(this)
+                ColorsPanelDialogFragment.show(this, IntArray(0)) {
+                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
+                }
                 return true
             }
         }

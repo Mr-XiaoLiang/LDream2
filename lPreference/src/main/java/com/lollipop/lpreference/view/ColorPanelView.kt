@@ -3,6 +3,7 @@ package com.lollipop.lpreference.view
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -11,6 +12,7 @@ import com.lollipop.lpreference.util.lifecycleBinding
 import com.lollipop.lpreference.util.onCancel
 import com.lollipop.lpreference.util.onEnd
 import com.lollipop.lpreference.util.onStart
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -24,6 +26,10 @@ class ColorPanelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
     constructor(context: Context):this(context,null)
 
     private var contextWeight = 0.8F
+
+    private val log = { value: String ->
+        Log.d("ColorPanelView", "${System.identityHashCode(this)}:$value")
+    }
 
     private val colorView = CirclePointView(context).apply {
         setTextColor(Color.WHITE)
@@ -47,15 +53,16 @@ class ColorPanelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        log("onMeasure")
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        if (measuredWidth == measuredHeight) {
-            val padding = (measuredWidth * (1 - contextWeight) * 0.5F).toInt()
-            if (padding != paddingLeft ||
-                padding != paddingTop ||
-                padding != paddingRight ||
-                padding != paddingBottom) {
-                setPadding(padding, padding, padding, padding)
-            }
+        val length = min(measuredWidth, measuredHeight)
+        val padding = (length * (1 - width) * 0.5F).toInt()
+        if (padding != paddingLeft ||
+            padding != paddingTop ||
+            padding != paddingRight ||
+            padding != paddingBottom) {
+            setPadding(padding, padding, padding, padding)
+            log("setPadding: $padding")
         }
     }
 

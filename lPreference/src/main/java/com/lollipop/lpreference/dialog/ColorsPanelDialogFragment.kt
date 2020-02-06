@@ -2,6 +2,7 @@ package com.lollipop.lpreference.dialog
 
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,15 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.view.animation.DecelerateInterpolator
+import android.widget.ImageView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
-import com.lollipop.lpreference.view.ColorPanelView
-import com.lollipop.lpreference.view.HuePaletteView
-import com.lollipop.lpreference.view.SatValPaletteView
-import com.lollipop.lpreference.view.TransparencyPaletteView
+import com.lollipop.lpreference.view.*
 import kotlinx.android.synthetic.main.fragment_colors_panel_dialog.*
+import java.lang.StringBuilder
 
 /**
  * 颜色选择的面板
@@ -29,11 +30,22 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     View.OnClickListener {
 
     companion object {
-        fun show(context: Context) {
+        fun show(context: Context, selectedColor: IntArray, callback: (IntArray) -> Unit) {
             ColorsPanelDialogFragment().apply {
-
+                selectedData.clear()
+                for (color in selectedColor) {
+                    selectedData.add(color)
+                }
+                selectedColorCallback = callback
             }.show(context, "ColorsPanelDialogFragment")
         }
+
+        private val ACTION_PALETTE = R.drawable.ic_palette_black_24dp
+        private val ACTION_DELETE = R.drawable.ic_delete_black_24dp
+        private val ACTION_ADD = R.drawable.ic_add_black_24dp
+
+        private const val PREFERENCE_KEY = "KEY_USER_COLORS"
+
     }
 
     override val contextId: Int
@@ -52,9 +64,11 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
 
     private var isEditMode = false
 
+    private var selectedColorCallback: ((IntArray) -> Unit)? = null
+
     private val itemAdapter: ItemAdapter by lazy {
         ItemAdapter(shownData, {
-            itemIsChecked(it)
+            isItemChecked(it)
         }, {
             onItemClick(it)
         }, shownActions)
@@ -66,16 +80,87 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         satValPalette.hsvCallback = this
         transparencyPalette.transparencyCallback = this
         definiteBtn.setOnClickListener(this)
-        selectedColor(colorRGB)
+        initPalette(colorRGB)
 
         colorPoolView.layoutManager = GridLayoutManager(colorPoolView.context,
-            4, RecyclerView.VERTICAL, false)
+            4, RecyclerView.VERTICAL, false).apply {
+
+        }
 
         colorPoolView.adapter = itemAdapter
-        itemAdapter.notifyDataSetChanged()
+        initData()
     }
 
-    private fun selectedColor(color: Int) {
+    private fun initData() {
+        getColorList()
+        if (shownData.isEmpty()) {
+            val defColors = resources.getIntArray(R.array.def_colors)
+            for (color in defColors) {
+                shownData.add(color)
+            }
+        }
+        for (color in selectedData) {
+            if (!ItemAdapter.hasColor(shownData, color)) {
+                shownData.add(color)
+            }
+        }
+        onModeChange()
+    }
+
+
+
+    override fun onDestroyView() {
+        saveColorList()
+        val result = IntArray(selectedData.size) { index -> selectedData[index] }
+        selectedColorCallback?.invoke(result)
+        super.onDestroyView()
+    }
+
+    private fun getColorList() {
+        context?.let {
+            val value = PreferenceHelper.get(it, PREFERENCE_KEY, "")
+            val colorArray = stringToList(value)
+            shownData.clear()
+            shownData.addAll(colorArray)
+        }
+    }
+
+    private fun saveColorList() {
+        context?.let {
+            val value = listToString(shownData)
+            PreferenceHelper.put(it, PREFERENCE_KEY, value)
+        }
+    }
+
+    private fun stringToList(value: String): Array<Int> {
+        if (value.isEmpty()) {
+            return arrayOf()
+        }
+        val values = value.split(":")
+        val result = Array(values.size) { 0 }
+        for (index in values.indices) {
+            val color = try {
+                values[index].toInt(16)
+            } catch (e: Exception) {
+                0
+            }
+            result[index] = color
+        }
+        return result
+    }
+
+    private fun listToString(list: ArrayList<Int>): String {
+        val builder = StringBuilder()
+        for (index in list.indices) {
+            if (index > 0) {
+                builder.append(":")
+            }
+            builder.append(list[index].toString(16))
+        }
+        return builder.toString()
+    }
+
+    private fun initPalette(color: Int) {
         Color.colorToHSV(color, hsvTemp)
         huePalette.parser(hsvTemp[0])
         satValPalette.parser(hsvTemp[1], hsvTemp[2])
@@ -182,12 +267,13 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     override fun onClick(v: View?) {
         when (v) {
             definiteBtn -> {
+                itemAdapter.addItem(merge())
                 closePalette()
             }
         }
     }
 
-    private fun itemIsChecked(position: Int): Int {
+    private fun isItemChecked(position: Int): Int {
         if (isEditMode) {
             return 0
         }
@@ -210,6 +296,11 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
         if (isEditMode) {
             itemAdapter.removeItem(shownData[holder.adapterPosition])
+            for (index in shownData.indices) {
+                if (ItemAdapter.hasColor(selectedData, shownData[index])) {
+                    itemAdapter.notifyItemChanged(index)
+                }
+            }
             return false
         }
         val position = holder.adapterPosition
@@ -225,11 +316,38 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     }
 
     private fun onActionSelected(actionId: Int) {
-        // TODO
+        when (actionId) {
+            ACTION_PALETTE -> {
+                if (isEditMode) {
+                    isEditMode = false
+                    onModeChange()
+                }
+            }
+            ACTION_DELETE -> {
+                if (!isEditMode) {
+                    isEditMode = true
+                    onModeChange()
+                }
+            }
+            ACTION_ADD -> {
+                openPalette()
+            }
+        }
     }
 
     private fun onModeChange() {
-        // TODO
+        shownActions.clear()
+        if (isEditMode) {
+            shownActions.add(ACTION_PALETTE)
+            modeStatusView.setImageResource(ACTION_DELETE)
+        } else {
+            shownActions.add(ACTION_DELETE)
+            if (modeStatusView.isPortrait()) {
+                shownActions.add(ACTION_ADD)
+            }
+            modeStatusView.setImageResource(ACTION_PALETTE)
+        }
+        itemAdapter.notifyDataSetChanged()
     }
 
     private class ItemAdapter(private val data: ArrayList<Int>,
@@ -252,6 +370,15 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
 
             fun isAction(holder: RecyclerView.ViewHolder): Boolean {
                 return holder is ActionHolder
+            }
+
+            fun hasColor(list: ArrayList<Int>, target: Int): Boolean {
+                for (color in list) {
+                    if (target == color) {
+                        return true
+                    }
+                }
+                return false
             }
 
         }
@@ -291,6 +418,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
 
         fun addItem(color: Int) {
+            if (hasColor(data, color)) {
+                return
+            }
             data.add(color)
             notifyItemInserted(data.size - 1)
         }
@@ -308,17 +438,19 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 notifyItemRemoved(index)
             }
         }
+
     }
 
-    private open class ItemHolder (protected val colorView: ColorPanelView,
-                            private val isChecked: (Int) -> Int,
-                            private val onClick: (RecyclerView.ViewHolder) -> Boolean):
-        RecyclerView.ViewHolder(colorView) {
+    private open class ItemHolder (view: View,
+                            protected val isChecked: (Int) -> Int,
+                            protected val onClick: (RecyclerView.ViewHolder) -> Boolean):
+        RecyclerView.ViewHolder(view) {
 
         companion object {
 
-            fun createView(viewGroup: ViewGroup): ColorPanelView {
-                return ColorPanelView(viewGroup.context)
+            fun createView(viewGroup: ViewGroup): View {
+                return LayoutInflater.from(viewGroup.context).inflate(
+                    R.layout.item_color_panel, viewGroup, false)
             }
 
             fun create(viewGroup: ViewGroup,
@@ -327,6 +459,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 return ItemHolder(createView(viewGroup), isChecked, onClick)
             }
         }
+
+        protected val colorView: CirclePointView = itemView.findViewById(R.id.colorView)
+        protected val borderView: ImageView = itemView.findViewById(R.id.borderView)
 
         init {
             itemView.setOnClickListener {
@@ -337,22 +472,63 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
 
         open fun onBind(value: Int) {
-            colorView.setColor(value)
+            setColor(value)
             updateCheckedStatus(false)
+            colorView.requestLayout()
         }
 
         private fun updateCheckedStatus(isAnim: Boolean = true) {
             val status = isChecked(this.adapterPosition)
             val checked = status != 0
             val value = if (status > 0) { status.toString() } else { "" }
-            colorView.setChecked(checked, value, isAnim)
+            setChecked(checked, value, isAnim)
+        }
+
+        protected fun setColor(color: Int) {
+            colorView.setStatusColor(color)
+        }
+
+        protected fun setChecked(isChecked: Boolean, number: String = "", animation: Boolean = true) {
+            if (animation) {
+                val start = if (isChecked) { 0F } else { 1F }
+                borderView.scaleX = start
+                borderView.scaleY = start
+                val end = if (isChecked) { 1F } else {0F }
+                borderView.animate().let { animator ->
+                    animator.cancel()
+                    animator.scaleX(end).scaleY(end)
+                    animator.lifecycleBinding {
+                        onStart {
+                            if (isChecked) {
+                                borderView.visibility = View.VISIBLE
+                                removeThis(it)
+                            }
+                        }
+                        onEnd {
+                            if (!isChecked) {
+                                borderView.visibility = View.INVISIBLE
+                            }
+                            removeThis(it)
+                        }
+                        onCancel {
+                            removeThis(it)
+                        }
+                    }
+                    animator.start()
+                }
+            } else {
+                borderView.scaleX = 1F
+                borderView.scaleY = 1F
+                borderView.visibility = if (isChecked) { View.VISIBLE } else { View.INVISIBLE }
+            }
+            colorView.setAutoValue(if (isChecked) { number } else { "" })
         }
 
     }
 
-    private class ActionHolder private constructor(colorView: ColorPanelView,
+    private class ActionHolder private constructor(view: View,
                                                   onClick: (RecyclerView.ViewHolder) -> Boolean):
-        ItemHolder(colorView, { 0 }, onClick) {
+        ItemHolder(view, { 0 }, onClick) {
 
         companion object {
             fun create(viewGroup: ViewGroup,
@@ -361,23 +537,22 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
             }
         }
 
+        var iconId = 0
+            private set
+
         init {
+            colorView.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
             itemView.setOnClickListener {
                 onClick(this)
             }
         }
 
-        var iconId = 0
-            private set
-
         override fun onBind(value: Int) {
             iconId = value
-            colorView.setBackgroundResource(value)
-            colorView.setColor(Color.TRANSPARENT)
-            colorView.setChecked(false)
+            borderView.setImageResource(value)
+            setColor(Color.TRANSPARENT)
+            setChecked(true, "", false)
         }
     }
-
-
 
 }
