@@ -34,14 +34,14 @@ open class SquareLayout(context: Context, attrs: AttributeSet?, defStyleAttr:Int
         var heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
         if (orientation == Orientation.HORIZONTAL) {
-            if (heightMode == MeasureSpec.UNSPECIFIED) {
+            if (heightSize <= 0) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec)
                 heightSize = measuredHeight
             }
             heightMode = MeasureSpec.EXACTLY
             widthMode = MeasureSpec.UNSPECIFIED
         } else if (orientation == Orientation.VERTICAL) {
-            if (widthMode == MeasureSpec.UNSPECIFIED) {
+            if (widthSize <= 0) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec)
                 widthSize = measuredWidth
             }
@@ -52,14 +52,12 @@ open class SquareLayout(context: Context, attrs: AttributeSet?, defStyleAttr:Int
         if (widthMode == MeasureSpec.EXACTLY && heightMode != MeasureSpec.EXACTLY) {
             // 如果横向确定，纵向不确定，那么扩展纵向
             heightSize = widthSize
-            heightMode = MeasureSpec.EXACTLY
         } else if (widthMode != MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
             // 如果纵向固定，横向不固定，那么横向扩展
             widthSize = heightSize
-            widthMode = MeasureSpec.EXACTLY
         }
-        super.onMeasure(MeasureSpec.makeMeasureSpec(widthSize, widthMode),
-            MeasureSpec.makeMeasureSpec(heightSize, heightMode))
+        super.onMeasure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY))
     }
 
 }
