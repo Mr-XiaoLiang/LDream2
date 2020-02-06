@@ -7,4 +7,7 @@
     <color name="T5">#BBBBBB</color>
     <color name="T6">#DDDDDD</color>
     <color name="TF">#FFFFFF</color>
+    <array name="def_colors">
+        <item>#FF0000</item>
+    </array>
 </resources>
