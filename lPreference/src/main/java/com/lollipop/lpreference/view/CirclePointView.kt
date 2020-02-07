@@ -5,8 +5,8 @@ import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.TypedValue
-import android.widget.TextView
+import android.view.View
+import com.lollipop.lpreference.util.log
 import kotlin.math.min
 
 /**
@@ -15,7 +15,7 @@ import kotlin.math.min
  * @author Lollipop
  */
 class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
-    : TextView(context,attrs,defStyleAttr) {
+    : View(context,attrs,defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
     constructor(context: Context):this(context,null)
@@ -29,7 +29,13 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         background = backgroundDrawable
     }
 
-    var contextWeight = 0.7F
+    var contextWeight: Float
+        get() {
+            return backgroundDrawable.contextWeight
+        }
+        set(value) {
+            backgroundDrawable.contextWeight = value
+        }
 
     fun setStatusColor(color:Int){
         backgroundDrawable.setColor(color)
@@ -37,6 +43,18 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
 
     override fun setBackgroundColor(color: Int) {
         setStatusColor(color)
+    }
+
+    var textColor: Int
+        set(value) {
+            backgroundDrawable.textColor = value
+        }
+        get() {
+            return backgroundDrawable.textColor
+        }
+
+    fun setShadowLayer(radius: Float, dx: Float, dy: Float, color: Int) {
+        backgroundDrawable.setShadowLayer(radius, dx, dy, color)
     }
 
     class CircleBgDrawable: Drawable() {
@@ -49,21 +67,51 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             strokeJoin = Paint.Join.MITER
             strokeCap = Paint.Cap.BUTT
         }
+        private val textPaint: Paint by lazy {
+            Paint().apply {
+                isAntiAlias = true
+                isDither = true
+                color = Color.WHITE
+                textAlign = Paint.Align.CENTER
+            }
+        }
         private val bound: RectF = RectF()
         private var biggestCorners = true
         private var corners = 0F
 
+        private var textY = 0F
+
+        var text = ""
+            private set
+
+        var contextWeight = 0.7F
+
+        var textColor: Int
+            set(value) {
+                textPaint.color = value
+            }
+            get() {
+                return textPaint.color
+            }
+
+        fun setShadowLayer(radius: Float, dx: Float, dy: Float, color: Int) {
+            textPaint.setShadowLayer(radius, dx, dy, color)
+        }
+
         override fun draw(canvas: Canvas) {
             canvas.drawRoundRect(bound, corners, corners, paint)
+            canvas.drawText(text, bound.centerX(), textY, textPaint)
         }
 
         override fun setAlpha(i: Int) {
             paint.alpha = i
+            textPaint.alpha = i
             invalidateSelf()
         }
 
         override fun setColorFilter(colorFilter: ColorFilter?) {
             paint.colorFilter = colorFilter
+            textPaint.colorFilter = colorFilter
             invalidateSelf()
         }
 
@@ -77,6 +125,7 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             if (biggestCorners) {
                 corners = min(bounds.width() * 0.5F, bounds.height() * 0.5F)
             }
+            checkTextSize()
             invalidateSelf()
         }
 
@@ -85,38 +134,65 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             invalidateSelf()
         }
 
-    }
-
-    fun setAutoValue(value: String) {
-        if (value.isNotEmpty()) {
-            val contentWidth = (width * 1F - paddingLeft - paddingRight) * contextWeight
-            val fontSize = refitText(contentWidth, value)
-            val contentHeight = (height * 1F - paddingTop - paddingBottom) * contextWeight
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, min(fontSize, contentHeight))
+        fun setText(value: String) {
+            text = value
+            checkTextSize()
         }
-        text = value
-    }
 
-    private fun refitText(targetWidth: Float, text: String): Float {
-        if (text.isEmpty()) {
-            return 1F
-        }
-        val threshold = 0.5f
-        val textPaint = paint
-        var preferredTextSize = targetWidth
-        var minTextSize = 1F
-        while (preferredTextSize - minTextSize > threshold) {
-            val size = (preferredTextSize + minTextSize) / 2
-            textPaint.textSize = size
-            if (textPaint.measureText(text) >= targetWidth) {
-                // too big
-                preferredTextSize = size
-            } else {
-                // too small
-                minTextSize = size
+        private val width: Int
+            get() = bounds.width()
+
+        private val height: Int
+            get() = bounds.height()
+
+        private fun checkTextSize() {
+            if (text.isNotEmpty() && width > 0 && height > 0) {
+                val contentWidth = width * contextWeight
+                log("checkTextSize: width=$width, contextWeight=$contextWeight")
+                val fontSize = refitText(contentWidth, text)
+                log("checkTextSize: value=$text, fontSize=$fontSize")
+                val contentHeight = height * contextWeight
+                textPaint.textSize = min(fontSize, contentHeight)
+
+                val fm = textPaint.fontMetrics
+                textY = (fm.descent - fm.ascent) / 2 - fm.descent + bound.centerY()
             }
+            invalidateSelf()
         }
-        return minTextSize
+
+        private fun refitText(targetWidth: Float, text: String): Float {
+            log("refitText: targetWidth=$targetWidth, text=$text")
+            if (text.isEmpty() || targetWidth < 1) {
+                return 1F
+            }
+            val threshold = 2f
+            val textPaint = textPaint
+            var preferredTextSize = targetWidth
+            var minTextSize = 1F
+            while (preferredTextSize - minTextSize > threshold) {
+                val size = (preferredTextSize + minTextSize) / 2
+                textPaint.textSize = size
+                if (textPaint.measureText(text) >= targetWidth) {
+                    // too big
+                    preferredTextSize = size
+                } else {
+                    // too small
+                    minTextSize = size
+                }
+            }
+            return minTextSize
+        }
+
     }
+
+     var text: String
+        get() {
+            return backgroundDrawable.text
+        }
+        set(value) {
+            backgroundDrawable.setText(value)
+        }
+
+
 
 }
