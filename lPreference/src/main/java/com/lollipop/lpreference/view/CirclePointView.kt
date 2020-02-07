@@ -5,7 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
+import android.widget.TextView
 import com.lollipop.lpreference.util.log
 import kotlin.math.min
 
@@ -15,18 +15,24 @@ import kotlin.math.min
  * @author Lollipop
  */
 class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
-    : View(context,attrs,defStyleAttr) {
+    : TextView(context,attrs,defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
     constructor(context: Context):this(context,null)
 
-    private val backgroundDrawable = CircleBgDrawable()
+    private val backgroundDrawable = CircleBgDrawable().apply {
+        setShadowLayer(shadowRadius, shadowDx, shadowDy, shadowColor)
+        setTextColor(textColors.defaultColor)
+    }
+
+    private var isInit = false
 
     init {
         if(background is ColorDrawable){
             backgroundDrawable.setColor((background as ColorDrawable).color)
         }
         background = backgroundDrawable
+        isInit = true
     }
 
     var contextWeight: Float
@@ -45,16 +51,18 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         setStatusColor(color)
     }
 
-    var textColor: Int
-        set(value) {
-            backgroundDrawable.textColor = value
+    override fun setTextColor(color: Int) {
+        super.setTextColor(color)
+        if (isInit) {
+            backgroundDrawable.setTextColor(color)
         }
-        get() {
-            return backgroundDrawable.textColor
-        }
+    }
 
-    fun setShadowLayer(radius: Float, dx: Float, dy: Float, color: Int) {
-        backgroundDrawable.setShadowLayer(radius, dx, dy, color)
+    override fun setShadowLayer(radius: Float, dx: Float, dy: Float, color: Int) {
+        super.setShadowLayer(radius, dx, dy, color)
+        if (isInit) {
+            backgroundDrawable.setShadowLayer(radius, dx, dy, color)
+        }
     }
 
     class CircleBgDrawable: Drawable() {
@@ -86,13 +94,9 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
 
         var contextWeight = 0.7F
 
-        var textColor: Int
-            set(value) {
-                textPaint.color = value
-            }
-            get() {
-                return textPaint.color
-            }
+        fun setTextColor(color: Int) {
+            textPaint.color = color
+        }
 
         fun setShadowLayer(radius: Float, dx: Float, dy: Float, color: Int) {
             textPaint.setShadowLayer(radius, dx, dy, color)
@@ -185,14 +189,12 @@ class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
 
     }
 
-     var text: String
+     var autoText: String
         get() {
             return backgroundDrawable.text
         }
         set(value) {
             backgroundDrawable.setText(value)
         }
-
-
 
 }

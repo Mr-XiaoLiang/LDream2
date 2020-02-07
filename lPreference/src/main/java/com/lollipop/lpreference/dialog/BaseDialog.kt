@@ -2,6 +2,7 @@ package com.lollipop.lpreference.dialog
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lollipop.lpreference.R
+import com.lollipop.lpreference.util.isPortrait
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 
 /**
@@ -52,6 +54,22 @@ abstract class BaseDialog: BottomSheetDialogFragment() {
         if (contextId != 0) {
             layoutInflater.inflate(contextId, contentGroup)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.let {
+            it.requestedOrientation = if (context.isPortrait()){
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }else {
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
 }
