@@ -283,6 +283,7 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         val color = shownData[position]
         for (index in selectedData.indices) {
             if (selectedData[index] == color) {
+                log("isItemChecked position=$position, index=$index")
                 return index + 1
             }
         }
@@ -296,11 +297,6 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
         if (isEditMode) {
             itemAdapter.removeItem(shownData[holder.adapterPosition])
-            for (index in shownData.indices) {
-                if (ItemAdapter.hasColor(selectedData, shownData[index])) {
-                    itemAdapter.notifyItemChanged(index)
-                }
-            }
             return false
         }
         val position = holder.adapterPosition
@@ -308,11 +304,21 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         for (index in selectedData.indices) {
             if (selectedData[index] == color) {
                 selectedData.removeAt(index)
+                updateSelectedItem()
                 return true
             }
         }
         selectedData.add(color)
         return true
+    }
+
+    private fun updateSelectedItem() {
+        for (index in shownData.indices) {
+            if (ItemAdapter.hasColor(selectedData, shownData[index])) {
+                log("update item index = $index")
+                itemAdapter.notifyItemChanged(index)
+            }
+        }
     }
 
     private fun onActionSelected(actionId: Int) {
@@ -469,6 +475,10 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                     updateCheckedStatus()
                 }
             }
+            colorView.apply {
+                textColor = Color.WHITE
+                setShadowLayer(2F, 1F, 1F, Color.BLACK)
+            }
         }
 
         open fun onBind(value: Int) {
@@ -489,6 +499,7 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
 
         protected fun setChecked(isChecked: Boolean, number: String = "", animation: Boolean = true) {
+            log("setChecked: isChecked=$isChecked, number=$number, animation=$animation")
             if (animation) {
                 val start = if (isChecked) { 0F } else { 1F }
                 borderView.scaleX = start
@@ -521,7 +532,7 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 borderView.scaleY = 1F
                 borderView.visibility = if (isChecked) { View.VISIBLE } else { View.INVISIBLE }
             }
-            colorView.setAutoValue(if (isChecked) { number } else { "" })
+            colorView.text = (if (isChecked) { number } else { "" })
         }
 
     }

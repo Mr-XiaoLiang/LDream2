@@ -3,6 +3,8 @@ package com.lollipop.lpreference.util
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import java.util.*
@@ -63,4 +65,14 @@ fun Context.isPortrait(): Boolean {
 
 fun View.isPortrait(): Boolean {
     return context.isPortrait()
+}
+
+fun Any.logger(tag: String = this.javaClass.simpleName): (String) -> Unit {
+    return {
+        Log.d("Lollipop-$tag" , it)
+    }
+}
+
+fun Any.log(value: String) {
+    logger()(value)
 }
