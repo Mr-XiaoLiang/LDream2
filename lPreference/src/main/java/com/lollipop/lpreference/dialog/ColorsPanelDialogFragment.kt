@@ -1,6 +1,7 @@
 package com.lollipop.lpreference.dialog
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -18,24 +19,27 @@ import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
 import com.lollipop.lpreference.view.*
 import kotlinx.android.synthetic.main.fragment_colors_panel_dialog.*
+import kotlinx.android.synthetic.main.fragment_palette.*
 import java.lang.StringBuilder
+import kotlin.math.max
 
 /**
  * 颜色选择的面板
  * @author Lollipop
  */
-class ColorsPanelDialogFragment private constructor(): BaseDialog(),
+class ColorsPanelDialogFragment: BaseDialog(),
     HuePaletteView.HueCallback, SatValPaletteView.HSVCallback,
     TransparencyPaletteView.TransparencyCallback,
     View.OnClickListener {
 
     companion object {
-        fun show(context: Context, selectedColor: IntArray, callback: (IntArray) -> Unit) {
+        fun show(context: Context, selectedColor: IntArray, max: Int = -1, callback: (IntArray) -> Unit) {
             ColorsPanelDialogFragment().apply {
                 selectedData.clear()
                 for (color in selectedColor) {
                     selectedData.add(color)
                 }
+                maxSelected = max
                 selectedColorCallback = callback
             }.show(context, "ColorsPanelDialogFragment")
         }
@@ -43,18 +47,16 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         private val ACTION_PALETTE = R.drawable.ic_palette_black_24dp
         private val ACTION_DELETE = R.drawable.ic_delete_black_24dp
         private val ACTION_ADD = R.drawable.ic_add_black_24dp
-
         private const val PREFERENCE_KEY = "KEY_USER_COLORS"
-
     }
 
     override val contextId: Int
         get() = R.layout.fragment_colors_panel_dialog
 
     private val hsvTemp = FloatArray(3)
-
     private var colorRGB = Color.RED
     private var colorAlpha = 255
+    private var maxSelected = -1
 
     private val shownData = ArrayList<Int>()
 
@@ -65,6 +67,8 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     private var isEditMode = false
 
     private var selectedColorCallback: ((IntArray) -> Unit)? = null
+
+    private val spanCount = 4
 
     private val itemAdapter: ItemAdapter by lazy {
         ItemAdapter(shownData, {
@@ -80,10 +84,14 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         satValPalette.hsvCallback = this
         transparencyPalette.transparencyCallback = this
         definiteBtn.setOnClickListener(this)
-        initPalette(colorRGB)
+        if (backBtn.isPortrait()) {
+            backBtn.setOnClickListener(this)
+        } else {
+            backBtn.visibility = View.GONE
+        }
 
         colorPoolView.layoutManager = GridLayoutManager(colorPoolView.context,
-            4, RecyclerView.VERTICAL, false).apply {
+            spanCount, RecyclerView.VERTICAL, false).apply {
 
         }
 
@@ -92,6 +100,11 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
     }
 
     private fun initData() {
+        if (maxSelected > 0) {
+            while (selectedData.size > maxSelected) {
+                selectedData.removeAt(selectedData.size - 1)
+            }
+        }
         getColorList()
         if (shownData.isEmpty()) {
             val defColors = resources.getIntArray(R.array.def_colors)
@@ -104,10 +117,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 shownData.add(color)
             }
         }
+        initPalette(if (shownData.isEmpty()) { Color.RED } else { shownData[shownData.size - 1] } )
         onModeChange()
     }
-
-
 
     override fun onDestroyView() {
         saveColorList()
@@ -213,13 +225,13 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
             animator.start()
         }
 
-        colorPoolView.animate().let { animator ->
+        poolPanel.animate().let { animator ->
             animator.cancel()
             changeInterpolator(animator)
-            animator.translationX(colorPoolView.width * -1F)
+            animator.translationX(poolPanel.width * -1F)
             animator.lifecycleBinding {
                 onStart {
-                    colorPoolView.visibility = View.INVISIBLE
+                    poolPanel.visibility = View.INVISIBLE
                     removeThis(it)
                 }
             }
@@ -244,13 +256,13 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
             animator.start()
         }
 
-        colorPoolView.animate().let { animator ->
+        poolPanel.animate().let { animator ->
             animator.cancel()
             changeInterpolator(animator)
             animator.translationX(0F)
             animator.lifecycleBinding {
                 onStart {
-                    colorPoolView.visibility = View.VISIBLE
+                    poolPanel.visibility = View.VISIBLE
                     removeThis(it)
                 }
             }
@@ -268,6 +280,9 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         when (v) {
             definiteBtn -> {
                 itemAdapter.addItem(merge())
+                closePalette()
+            }
+            backBtn -> {
                 closePalette()
             }
         }
@@ -304,20 +319,29 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         for (index in selectedData.indices) {
             if (selectedData[index] == color) {
                 selectedData.removeAt(index)
-                updateSelectedItem()
+                updateSelectedItem(index)
                 return true
             }
         }
+        if (maxSelected > 0 && selectedData.size >= maxSelected) {
+            return false
+        }
         selectedData.add(color)
+        updateSelectedItem(selectedData.size)
         return true
     }
 
-    private fun updateSelectedItem() {
-        for (index in shownData.indices) {
-            if (ItemAdapter.hasColor(selectedData, shownData[index])) {
-                log("update item index = $index")
-                itemAdapter.notifyItemChanged(index)
-            }
+    @SuppressLint("SetTextI18n")
+    private fun updateSelectedItem(start: Int = 0) {
+        if (maxSelected > 0) {
+            selectedSizeView.text = "${selectedData.size}/$maxSelected"
+        }
+        if (start >= selectedData.size) {
+            return
+        }
+        val startIndex = max(start, 0)
+        for (index in startIndex until selectedData.size) {
+            itemAdapter.notifyItemChanged(shownData.indexOf(selectedData[index]))
         }
     }
 
@@ -352,6 +376,10 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 shownActions.add(ACTION_ADD)
             }
             modeStatusView.setImageResource(ACTION_PALETTE)
+        }
+        // 添加空内容
+        for (i in 0 until spanCount) {
+            shownActions.add(0)
         }
         itemAdapter.notifyDataSetChanged()
     }
@@ -476,7 +504,7 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 }
             }
             colorView.apply {
-                textColor = Color.WHITE
+                setTextColor(Color.WHITE)
                 setShadowLayer(2F, 1F, 1F, Color.BLACK)
             }
         }
@@ -532,7 +560,7 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
                 borderView.scaleY = 1F
                 borderView.visibility = if (isChecked) { View.VISIBLE } else { View.INVISIBLE }
             }
-            colorView.text = (if (isChecked) { number } else { "" })
+            colorView.autoText = (if (isChecked) { number } else { "" })
         }
 
     }
@@ -559,10 +587,16 @@ class ColorsPanelDialogFragment private constructor(): BaseDialog(),
         }
 
         override fun onBind(value: Int) {
+            if (value != 0) {
+                itemView.isClickable = true
+                setChecked(true, "", false)
+            } else {
+                itemView.isClickable = false
+                setChecked(false, "", false)
+            }
             iconId = value
             borderView.setImageResource(value)
             setColor(Color.TRANSPARENT)
-            setChecked(true, "", false)
         }
     }
 
