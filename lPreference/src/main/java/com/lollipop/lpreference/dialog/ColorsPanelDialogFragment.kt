@@ -119,6 +119,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
         }
         initPalette(if (shownData.isEmpty()) { Color.RED } else { shownData[shownData.size - 1] } )
         onModeChange()
+        updateSelectedItem()
     }
 
     override fun onDestroyView() {
@@ -311,7 +312,10 @@ class ColorsPanelDialogFragment: BaseDialog(),
             return true
         }
         if (isEditMode) {
-            itemAdapter.removeItem(shownData[holder.adapterPosition])
+            val color = shownData[holder.adapterPosition]
+            itemAdapter.removeItem(color)
+            selectedData.remove(color)
+            updateSelectedItem()
             return false
         }
         val position = holder.adapterPosition
@@ -327,20 +331,19 @@ class ColorsPanelDialogFragment: BaseDialog(),
             return false
         }
         selectedData.add(color)
-        updateSelectedItem(selectedData.size)
+        updateSelectedItem()
         return true
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateSelectedItem(start: Int = 0) {
+    private fun updateSelectedItem(start: Int = -1) {
         if (maxSelected > 0) {
             selectedSizeView.text = "${selectedData.size}/$maxSelected"
         }
-        if (start >= selectedData.size) {
+        if (start < 0 || start >= selectedData.size) {
             return
         }
-        val startIndex = max(start, 0)
-        for (index in startIndex until selectedData.size) {
+        for (index in start until selectedData.size) {
             itemAdapter.notifyItemChanged(shownData.indexOf(selectedData[index]))
         }
     }
