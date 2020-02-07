@@ -17,11 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
-import com.lollipop.lpreference.view.*
+import com.lollipop.lpreference.view.CirclePointView
+import com.lollipop.lpreference.view.HuePaletteView
+import com.lollipop.lpreference.view.SatValPaletteView
+import com.lollipop.lpreference.view.TransparencyPaletteView
 import kotlinx.android.synthetic.main.fragment_colors_panel_dialog.*
 import kotlinx.android.synthetic.main.fragment_palette.*
-import java.lang.StringBuilder
-import kotlin.math.max
 
 /**
  * 颜色选择的面板
