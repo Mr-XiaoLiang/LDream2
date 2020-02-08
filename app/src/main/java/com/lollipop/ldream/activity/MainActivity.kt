@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                     title = "关键字"
                     summary = "设置关键字"
                 },
-                action("action", Intent(Settings.ACTION_SETTINGS)) {
+                action(Intent(Settings.ACTION_SETTINGS)) {
                     title = "跳转到设置"
                     summary = "跳转到设置页面"
                 },

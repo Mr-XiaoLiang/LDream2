@@ -7,4 +7,10 @@ import android.content.Intent
  * @date 2020-01-18 20:38
  * 跳转意图偏好设置
  */
-class ActionPreferenceInfo(key: String, val action: Intent): BasePreferenceInfo<Intent>(key, Intent())
+class ActionPreferenceInfo(val action: Intent): BasePreferenceInfo<Intent>(myKey(), Intent()) {
+    companion object {
+        private fun Any.myKey(): String {
+            return System.identityHashCode(this).toString(16)
+        }
+    }
+}

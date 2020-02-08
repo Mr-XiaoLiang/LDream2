@@ -148,10 +148,9 @@ class PreferenceHelper(private val group: RecyclerView) {
         return NumberPreferenceInfo(key).apply(run)
     }
 
-    fun action(key: String, action: Intent,
+    fun action(action: Intent,
                run: ActionPreferenceInfo.() -> Unit): ActionPreferenceInfo {
-        checkItem(key)
-        return ActionPreferenceInfo(key, action).apply(run)
+        return ActionPreferenceInfo(action).apply(run)
     }
 
     fun switch(key: String, run: SwitchPreferenceInfo.() -> Unit): SwitchPreferenceInfo {
