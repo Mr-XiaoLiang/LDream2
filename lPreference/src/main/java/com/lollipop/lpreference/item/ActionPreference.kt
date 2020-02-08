@@ -15,7 +15,17 @@ class ActionPreference(group: ViewGroup): BasePreferenceItem<ActionPreferenceInf
     override fun onItemClick(view: View) {
         super.onItemClick(view)
         preferenceInfo?.let {
-            context.startActivity(it.action)
+            when (it.actionType) {
+                ActionPreferenceInfo.ActionType.Activity -> {
+                    context.startActivity(it.action)
+                }
+                ActionPreferenceInfo.ActionType.Service -> {
+                    context.startService(it.action)
+                }
+                ActionPreferenceInfo.ActionType.Broadcast -> {
+                    context.sendBroadcast(it.action)
+                }
+            }
         }
     }
 

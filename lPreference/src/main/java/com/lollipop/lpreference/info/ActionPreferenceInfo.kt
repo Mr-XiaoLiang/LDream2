@@ -13,4 +13,13 @@ class ActionPreferenceInfo(val action: Intent): BasePreferenceInfo<Intent>(myKey
             return System.identityHashCode(this).toString(16)
         }
     }
+
+    var actionType = ActionType.Activity
+
+    enum class ActionType {
+        Activity,
+        Service,
+        Broadcast
+    }
+
 }
