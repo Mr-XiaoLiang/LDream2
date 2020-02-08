@@ -1,6 +1,7 @@
 package com.lollipop.ldream.activity
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
@@ -46,6 +47,12 @@ class MainActivity : AppCompatActivity() {
                     summary = "打开或者关闭开关"
                     summaryTrue = "你已经打开了开关"
                     summaryFalse = "你已经关闭了开关"
+                },
+                colors("colors") {
+                    title = "颜色"
+                    summary = "选择主题色"
+                    maxSize = 5
+                    defaultColors = intArrayOf(Color.RED)
                 }
             )
         }
@@ -54,10 +61,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-//                onBackPressed()
-                ColorsPanelDialogFragment.show(this, IntArray(0), 5) {
-                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
-                }
+                onBackPressed()
+//                ColorsPanelDialogFragment.show(this, IntArray(0), 5) {
+//                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
+//                }
                 return true
             }
         }

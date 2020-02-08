@@ -14,7 +14,7 @@ import kotlin.math.min
  * 状态的显示View
  * @author Lollipop
  */
-class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
+class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
     : TextView(context,attrs,defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)

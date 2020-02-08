@@ -1,11 +1,7 @@
 package com.lollipop.lpreference
 
 import android.view.ViewGroup
-import android.widget.Switch
-import com.lollipop.lpreference.info.ActionPreferenceInfo
-import com.lollipop.lpreference.info.BasePreferenceInfo
-import com.lollipop.lpreference.info.NumberPreferenceInfo
-import com.lollipop.lpreference.info.SwitchPreferenceInfo
+import com.lollipop.lpreference.info.*
 import com.lollipop.lpreference.item.*
 
 /**
@@ -19,12 +15,14 @@ object PreferenceFactory {
     private const val Number = 1
     private const val Action = 2
     private const val Switch = 3
+    private const val Colors = 4
 
     fun getInfoType(info: BasePreferenceInfo<*>): Int {
         return when (info) {
             is NumberPreferenceInfo -> Number
             is ActionPreferenceInfo -> Action
             is SwitchPreferenceInfo -> Switch
+            is ColorsPreferenceInfo -> Colors
             else -> Empty
         }
     }
@@ -34,6 +32,7 @@ object PreferenceFactory {
             Number -> NumberPreference(group)
             Action -> ActionPreference(group)
             Switch -> SwitchPreference(group)
+            Colors -> ColorsPreference(group)
             else -> EmptyPreferenceItem(group)
         }
     }
@@ -47,6 +46,9 @@ object PreferenceFactory {
                 item.bind(info)
             }
             is SwitchPreference -> if (info is SwitchPreferenceInfo) {
+                item.bind(info)
+            }
+            is ColorsPreference -> if (info is ColorsPreferenceInfo) {
                 item.bind(info)
             }
             is EmptyPreferenceItem -> {
