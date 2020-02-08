@@ -6,10 +6,7 @@ import android.text.TextUtils
 import android.util.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lollipop.lpreference.info.ActionPreferenceInfo
-import com.lollipop.lpreference.info.BasePreferenceInfo
-import com.lollipop.lpreference.info.NumberPreferenceInfo
-import com.lollipop.lpreference.info.SwitchPreferenceInfo
+import com.lollipop.lpreference.info.*
 
 /**
  * @author lollipop
@@ -160,6 +157,11 @@ class PreferenceHelper(private val group: RecyclerView) {
     fun switch(key: String, run: SwitchPreferenceInfo.() -> Unit): SwitchPreferenceInfo {
         checkItem(key)
         return SwitchPreferenceInfo(key).apply(run)
+    }
+
+    fun colors(key: String, run: ColorsPreferenceInfo.() -> Unit): ColorsPreferenceInfo {
+        checkItem(key)
+        return ColorsPreferenceInfo(key).apply(run)
     }
 
     private fun checkItem(key: String) {

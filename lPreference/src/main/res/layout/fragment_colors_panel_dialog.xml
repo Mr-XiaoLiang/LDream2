@@ -46,4 +46,8 @@
         android:visibility="invisible"
         layout="@layout/fragment_palette"/>
 
+    <com.lollipop.lpreference.view.ColorWheelView
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
 </FrameLayout>

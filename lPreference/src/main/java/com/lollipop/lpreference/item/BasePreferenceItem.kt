@@ -137,7 +137,9 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
         }
     }
 
-    protected open fun onPreviewClick(view: View) { }
+    protected open fun onPreviewClick(view: View): Boolean {
+        return false
+    }
 
     protected open fun onItemClick(view: View) { }
 
@@ -205,7 +207,9 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
                 onItemClick(v)
             }
             previewBody -> {
-                onPreviewClick(v)
+                if (!onPreviewClick(v)) {
+                    onItemClick(v)
+                }
             }
         }
     }

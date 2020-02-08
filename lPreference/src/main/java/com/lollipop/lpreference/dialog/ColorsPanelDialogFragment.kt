@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
+import com.lollipop.lpreference.value.ColorArray
 import com.lollipop.lpreference.view.CirclePointView
 import com.lollipop.lpreference.view.HuePaletteView
 import com.lollipop.lpreference.view.SatValPaletteView
@@ -34,7 +35,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
     View.OnClickListener {
 
     companion object {
-        fun show(context: Context, selectedColor: IntArray, max: Int = -1, callback: (IntArray) -> Unit) {
+        fun show(context: Context, selectedColor: ColorArray, max: Int = -1, callback: (IntArray) -> Unit) {
             ColorsPanelDialogFragment().apply {
                 selectedData.clear()
                 for (color in selectedColor) {

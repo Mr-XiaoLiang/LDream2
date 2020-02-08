@@ -23,7 +23,7 @@ class SwitchPreference(group: ViewGroup): BasePreferenceItem<SwitchPreferenceInf
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        PreferenceHelper.put(context, preferenceKey, isChecked)
+        preferenceInfo?.putValue(context, isChecked)
         notifyInfoChange()
     }
 

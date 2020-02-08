@@ -39,9 +39,11 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
      */
     var relevantEnable = true
 
+    protected var onValueGetter: ((T) -> T)? = null
+
     @Suppress("UNCHECKED_CAST")
     fun getValue(context: Context): T {
-        return when (default) {
+        val result = when (default) {
             is PreferenceValue -> {
                 default.parse(
                     PreferenceHelper.get(
@@ -71,6 +73,7 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
                         "please Implementing the PreferenceValue interface")
             }
         } as T
+        return onValueGetter?.invoke(result)?:result
     }
 
     fun putValue(context: Context, value: T) {
