@@ -13,9 +13,11 @@
         app:layout_constraintBottom_toTopOf="@id/folderSpinner"/>
 
     <androidx.appcompat.widget.AppCompatSpinner
+        android:background="@android:color/black"
         android:id="@+id/folderSpinner"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="48dp"/>
+        android:layout_height="48dp"
+        android:elevation="6dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
