@@ -76,3 +76,8 @@ fun Any.logger(tag: String = this.javaClass.simpleName): (String) -> Unit {
 fun Any.log(value: String) {
     logger()(value)
 }
+
+val Any.objId: String
+    get() {
+        return System.identityHashCode(this).toString(16)
+    }

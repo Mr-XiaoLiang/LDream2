@@ -11,6 +11,7 @@ import com.lollipop.ldream.R
 import com.lollipop.ldream.util.TimerHelper
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
+import com.lollipop.lpreference.util.ScaleImageHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         preferenceList.post {
             initPreference()
         }
+        ScaleImageHelper.with(scaleView)
     }
 
     private fun initPreference() {
