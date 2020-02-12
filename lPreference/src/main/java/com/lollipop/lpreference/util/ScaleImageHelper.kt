@@ -130,7 +130,7 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         event?:return false
         v?:return false
-        var touchStatus = false
+//        var touchStatus = false
 //        when (event.action) {
 //            MotionEvent.ACTION_DOWN -> {
 //                log("$objId, onDown")
@@ -165,7 +165,7 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
 //                return false
 //            }
 //        }
-        return scaleGestureDetector.onTouchEvent(event) || touchStatus
+        return scaleGestureDetector.onTouchEvent(event) // || touchStatus
     }
 
     private fun MotionEvent.checkPointId() {
