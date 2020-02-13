@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.graphics.RectF
-import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -25,9 +24,9 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
     private val displayRect = RectF()
     private var viewWidth = 0
     private var viewHeight = 0
-    private val downTouch = PointF()
-    private val offset = PointF()
-    private var pointerId = 0
+//    private val downTouch = PointF()
+    private val offset = PointF(0F, 0F)
+//    private var pointerId = 0
 
     companion object {
         @SuppressLint("ClickableViewAccessibility")
@@ -168,21 +167,21 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
         return scaleGestureDetector.onTouchEvent(event) // || touchStatus
     }
 
-    private fun MotionEvent.checkPointId() {
-        val pointerIndex = this.findPointerIndex(pointerId)
-        if (pointerIndex < 0) {
-            pointerId = this.getPointerId(0)
-        }
-    }
+//    private fun MotionEvent.checkPointId() {
+//        val pointerIndex = this.findPointerIndex(pointerId)
+//        if (pointerIndex < 0) {
+//            pointerId = this.getPointerId(0)
+//        }
+//    }
 
-    private fun MotionEvent.xById(): Float {
-        checkPointId()
-        return this.getX(this.findPointerIndex(pointerId))
-    }
-
-    private fun MotionEvent.yById(): Float {
-        checkPointId()
-        return getY(findPointerIndex(pointerId))
-    }
+//    private fun MotionEvent.xById(): Float {
+//        checkPointId()
+//        return this.getX(this.findPointerIndex(pointerId))
+//    }
+//
+//    private fun MotionEvent.yById(): Float {
+//        checkPointId()
+//        return getY(findPointerIndex(pointerId))
+//    }
 
 }

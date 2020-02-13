@@ -3,11 +3,15 @@ package com.lollipop.lpreference.util
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.math.min
 
@@ -81,3 +85,27 @@ val Any.objId: String
     get() {
         return System.identityHashCode(this).toString(16)
     }
+
+private val threadPool: Executor by lazy {
+    Executors.newCachedThreadPool()
+}
+
+private val mainHandler: Handler by lazy {
+    Handler(Looper.getMainLooper())
+}
+
+fun <T> T.doAsync(error: ((Throwable) -> Unit)? = null, run: T.() -> Unit) {
+    threadPool.execute {
+        try {
+            run.invoke(this)
+        } catch (e: Throwable) {
+            error?.invoke(e)
+        }
+    }
+}
+
+fun <T> T.onUI(run: T.() -> Unit) {
+    mainHandler.post {
+        run.invoke(this)
+    }
+}
