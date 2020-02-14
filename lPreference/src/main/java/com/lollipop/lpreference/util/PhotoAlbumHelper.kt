@@ -13,21 +13,69 @@ import com.lollipop.lpreference.value.PhotoInfo
  */
 class PhotoAlbumHelper {
 
+    companion object {
+        private const val MIN_INTERVAL = 1000L * 10
+    }
+
     val data = ArrayList<PhotoInfo>()
+
+    val selected = ArrayList<PhotoInfo>()
 
     private var onCompleteCallback: ((PhotoAlbumHelper) -> Unit)? = null
     private var onErrorCallback: ((Throwable) -> Unit)? = null
 
-    fun onComplete(callback: (PhotoAlbumHelper) -> Unit) {
+    private var lastInit = 0L
+
+    val isEmpty: Boolean
+        get() {
+            return data.isEmpty()
+        }
+
+    val selectedSize: Int
+        get() {
+            return selected.size
+        }
+
+    fun get(position: Int) : PhotoInfo {
+        return data[position]
+    }
+
+    fun selectedIndex(info: PhotoInfo) : Int {
+        return selected.indexOf(info)
+    }
+
+    fun selectedIndexByPosition(position: Int) : Int {
+        return selectedIndex(get(position))
+    }
+
+    fun positionBySelectedIndex(index: Int) : Int {
+        return data.indexOf(selected[index])
+    }
+
+    fun isChecked(position: Int): Int {
+        if (isEmpty) {
+            return 0
+        }
+        if (position < 0 || position >= data.size) {
+            return 0
+        }
+        return selectedIndexByPosition(position)
+    }
+
+    fun onComplete(callback: ((PhotoAlbumHelper) -> Unit)?) {
         onCompleteCallback = callback
     }
 
-    fun onError(callback: (Throwable) -> Unit) {
+    fun onError(callback: ((Throwable) -> Unit)?) {
         onErrorCallback = callback
     }
 
     fun initData(context: Context) {
+        if (System.currentTimeMillis() - lastInit < MIN_INTERVAL) {
+            return
+        }
         doAsync({
+            data.clear()
             onErrorCallback?.invoke(it)
         }) {
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -49,6 +97,7 @@ class PhotoAlbumHelper {
                 data.add(PhotoInfo(ContentUris.withAppendedId(uri, id), size, name))
             }
             cursor?.close()
+            lastInit = System.currentTimeMillis()
             onUI {
                 onCompleteCallback?.invoke(this@PhotoAlbumHelper)
             }

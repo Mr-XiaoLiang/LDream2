@@ -5,15 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:visibility="invisible"
+        android:src="@drawable/ic_folder_open_black_24dp"
+        android:scaleType="fitXY"
+        android:id="@+id/statusView"
+        android:tint="@android:color/white"
+        android:alpha="0.3"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintTop_toTopOf="@id/imagesGroup"
+        app:layout_constraintBottom_toBottomOf="@id/imagesGroup"
+        app:layout_constraintLeft_toLeftOf="@id/imagesGroup"
+        app:layout_constraintRight_toRightOf="@id/imagesGroup"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/imagesGroup"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/sizeView"
+        android:gravity="center"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_margin="16dp"
@@ -49,6 +63,7 @@
 
         </com.lollipop.lpreference.view.SquareLayout>
         <ImageView
+            android:id="@+id/closePreviewBtn"
             android:background="@drawable/bg_preference_icon"
             android:scaleType="center"
             android:src="@drawable/ic_close_black_24dp"

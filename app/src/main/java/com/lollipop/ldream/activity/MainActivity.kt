@@ -5,12 +5,15 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
 import com.lollipop.ldream.util.TimerHelper
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
+import com.lollipop.lpreference.dialog.ImagesPanelDialogFragment
 import com.lollipop.lpreference.util.ScaleImageHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
@@ -30,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         preferenceList.post {
             initPreference()
         }
-        ScaleImageHelper.with(scaleView)
     }
 
     private fun initPreference() {
@@ -63,10 +65,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+//                onBackPressed()
 //                ColorsPanelDialogFragment.show(this, IntArray(0), 5) {
 //                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
 //                }
+                ImagesPanelDialogFragment().show(supportFragmentManager, "Images")
                 return true
             }
         }

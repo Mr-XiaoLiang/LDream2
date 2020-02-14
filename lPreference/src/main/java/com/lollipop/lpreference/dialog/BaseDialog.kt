@@ -1,5 +1,6 @@
 package com.lollipop.lpreference.dialog
 
+import android.app.Dialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -54,7 +56,18 @@ abstract class BaseDialog: BottomSheetDialogFragment() {
         if (contextId != 0) {
             layoutInflater.inflate(contextId, contentGroup)
         }
+//        view.fitsSystemWindows = true
+//        view.setOnApplyWindowInsetsListener { v, insets ->
+//            val allPadding = insets.stableInsetBottom + insets.stableInsetTop
+//            contentGroup.setPadding(0, 0, 0, allPadding)
+//            insets.consumeStableInsets()
+//        }
     }
+
+//    override fun setupDialog(dialog: Dialog, style: Int) {
+//        super.setupDialog(dialog, style)
+//        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+//    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -62,7 +75,7 @@ abstract class BaseDialog: BottomSheetDialogFragment() {
             it.requestedOrientation = if (context.isPortrait()){
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }else {
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
         }
     }
