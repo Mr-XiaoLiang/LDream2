@@ -94,10 +94,15 @@ class ColorsPanelDialogFragment: BaseDialog(),
 
         colorPoolView.layoutManager = GridLayoutManager(colorPoolView.context,
             spanCount, RecyclerView.VERTICAL, false).apply {
-
         }
-
         colorPoolView.adapter = itemAdapter
+        if (poolPanel.isPortrait()) {
+            poolPanel.post {
+                colorPoolView.layoutParams = colorPoolView.layoutParams.apply {
+                    width = poolPanel.width
+                }
+            }
+        }
         initData()
     }
 

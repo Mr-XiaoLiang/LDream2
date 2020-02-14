@@ -34,8 +34,6 @@
                 android:textColor="@android:color/white"/>
 
         </LinearLayout>
-
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/colorPoolView"
             android:layout_width="match_parent"
@@ -45,9 +43,5 @@
     <include
         android:visibility="invisible"
         layout="@layout/fragment_palette"/>
-
-    <com.lollipop.lpreference.view.ColorWheelView
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
 
 </FrameLayout>

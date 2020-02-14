@@ -7,6 +7,7 @@ import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 
 
@@ -30,8 +31,10 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
 
     companion object {
         @SuppressLint("ClickableViewAccessibility")
-        fun with(view: ImageView) {
-            view.setOnTouchListener(ScaleImageHelper(view))
+        fun with(view: ImageView): ScaleImageHelper {
+            val helper = ScaleImageHelper(view)
+            view.setOnTouchListener(helper)
+            return helper
         }
     }
 
@@ -41,7 +44,6 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
             viewHeight = imageView.height - imageView.paddingTop - imageView.paddingBottom
             notifyScaleChange()
         }
-        imageView.scaleType = ImageView.ScaleType.MATRIX
     }
 
     private val scaleGestureDetector = ScaleGestureDetector(imageView.context, this)
@@ -67,9 +69,15 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
         return true
     }
 
+    fun reset() {
+        imageView.imageMatrix = null
+        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+    }
+
     private fun notifyScaleChange() {
         if(checkMatrixBounds()) {
             log("$objId, notifyScaleChange")
+            imageView.scaleType = ImageView.ScaleType.MATRIX
             imageView.imageMatrix = getDrawMatrix()
         }
     }
@@ -129,6 +137,9 @@ class ScaleImageHelper private constructor(private val imageView: ImageView): Vi
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         event?:return false
         v?:return false
+        if (v.parent is ViewGroup) {
+            v.parent.requestDisallowInterceptTouchEvent(true)
+        }
 //        var touchStatus = false
 //        when (event.action) {
 //            MotionEvent.ACTION_DOWN -> {

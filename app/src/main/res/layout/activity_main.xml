@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootGroup"
     tools:context=".activity.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -57,12 +58,5 @@
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scaleView"
-        android:src="@drawable/ic_launcher_foreground"
-        android:scaleType="center"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
