@@ -33,7 +33,7 @@ class ImagesPanelDialogFragment : BaseDialog() {
         fun show(context: Context, selected: ArrayList<Uri>,
                  callback: (Array<Uri>) -> Unit) {
             ImagesPanelDialogFragment().apply {
-                selectedColorCallback = callback
+                selectedImagesCallback = callback
                 presetUriList.addAll(selected)
             }.show(context, "ImagesPanelDialogFragment")
         }
@@ -46,7 +46,7 @@ class ImagesPanelDialogFragment : BaseDialog() {
 
     private var maxSize = -1
 
-    private var selectedColorCallback: ((Array<Uri>) -> Unit)? = null
+    private var selectedImagesCallback: ((Array<Uri>) -> Unit)? = null
 
     private var presetUriList = ArrayList<Uri>()
 
@@ -202,6 +202,10 @@ class ImagesPanelDialogFragment : BaseDialog() {
         super.onDestroyView()
         photoAlbumHelper.onComplete(null)
         photoAlbumHelper.onError(null)
+        val uriArray = Array(photoAlbumHelper.selectedSize) {
+            photoAlbumHelper.selected[it].path
+        }
+        selectedImagesCallback?.invoke(uriArray)
     }
 
     override fun onResume() {
