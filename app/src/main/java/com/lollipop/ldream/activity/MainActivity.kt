@@ -69,7 +69,9 @@ class MainActivity : AppCompatActivity() {
 //                ColorsPanelDialogFragment.show(this, IntArray(0), 5) {
 //                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
 //                }
-                ImagesPanelDialogFragment().show(supportFragmentManager, "Images")
+                ImagesPanelDialogFragment.show(this) {
+                    Toast.makeText(this, "选中了${it.size}个图片", Toast.LENGTH_SHORT).show()
+                }
                 return true
             }
         }
