@@ -2,7 +2,9 @@ package com.lollipop.lpreference.dialog
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -27,6 +29,14 @@ class ImagesPanelDialogFragment : BaseDialog() {
     companion object {
         private const val SPAN_COUNT = 4
         private const val REQUEST_PERMISSION_READ = 233
+
+        fun show(context: Context, selected: ArrayList<Uri>,
+                 callback: (Array<Uri>) -> Unit) {
+            ImagesPanelDialogFragment().apply {
+                selectedColorCallback = callback
+                presetUriList.addAll(selected)
+            }.show(context, "ImagesPanelDialogFragment")
+        }
     }
 
     override val contextId: Int
@@ -34,7 +44,11 @@ class ImagesPanelDialogFragment : BaseDialog() {
 
     private val photoAlbumHelper = PhotoAlbumHelper()
 
-    private var maxSize = 3
+    private var maxSize = -1
+
+    private var selectedColorCallback: ((Array<Uri>) -> Unit)? = null
+
+    private var presetUriList = ArrayList<Uri>()
 
     private val adapter: PhotoAdapter by lazy {
         PhotoAdapter(photoAlbumHelper.data, SPAN_COUNT, {
@@ -130,6 +144,14 @@ class ImagesPanelDialogFragment : BaseDialog() {
                 statusView.setImageResource(R.drawable.ic_folder_open_black_24dp)
             } else {
                 statusView.visibility = View.INVISIBLE
+            }
+            photoAlbumHelper.selected.clear()
+            photoAlbumHelper.data.forEach { info ->
+                for (preset in presetUriList) {
+                    if (info.path == preset) {
+                        photoAlbumHelper.selected.add(info)
+                    }
+                }
             }
             updateSelectedSize()
         }
