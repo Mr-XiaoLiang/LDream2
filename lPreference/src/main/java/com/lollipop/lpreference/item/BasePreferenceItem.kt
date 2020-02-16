@@ -9,7 +9,6 @@ import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.PreferenceConfig
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.info.BasePreferenceInfo
@@ -19,9 +18,13 @@ import com.lollipop.lpreference.info.BasePreferenceInfo
  * @date 2020-01-16 23:08
  * 基础的偏好设置项
  */
-abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructor(view: View) :
-    RecyclerView.ViewHolder(view),
+abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> (group: ViewGroup) :
+    PreferenceItem<T>(createView(group, DEF_LAYOUT)),
     View.OnClickListener{
+
+    companion object {
+        private val DEF_LAYOUT = R.layout.item_base_preference
+    }
 
     private var isInit = false
 
@@ -50,20 +53,6 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
     private val notifyItemChangeTask: Runnable by lazy {
         Runnable {
             preferenceChangeCallback?.invoke(adapterPosition)
-        }
-    }
-
-    constructor(group: ViewGroup): this(
-        createView(
-            group
-        )
-    )
-
-    companion object {
-        private fun createView(group: ViewGroup): View {
-            return LayoutInflater.from(group.context).inflate(
-                R.layout.item_base_preference,
-                group, false)
         }
     }
 
@@ -159,7 +148,7 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> private constructo
             summaryView.text = value
         }
 
-    fun bind(info: T) {
+    override fun bind(info: T) {
         preferenceInfo = info
         title = info.title
         summary = info.summary

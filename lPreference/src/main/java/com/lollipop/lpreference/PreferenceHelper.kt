@@ -1,13 +1,14 @@
 package com.lollipop.lpreference
 
 import android.content.Context
-import android.content.Intent
 import android.text.TextUtils
 import android.util.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lollipop.lpreference.info.*
-import java.lang.ClassCastException
+import com.lollipop.lpreference.info.BasePreferenceInfo
+import com.lollipop.lpreference.info.PreferenceInfo
+import com.lollipop.lpreference.value.PreferenceValue
+import com.lollipop.lpreference.view.ItemBuilder
 
 /**
  * @author lollipop
@@ -41,6 +42,9 @@ class PreferenceHelper(private val group: RecyclerView) {
                 }
                 is Long -> {
                     preference.putLong(key, value)
+                }
+                is PreferenceValue -> {
+                    preference.putString(key, value.serialization())
                 }
                 is Set<*> -> {
                     if (value.isEmpty()) {
@@ -76,6 +80,10 @@ class PreferenceHelper(private val group: RecyclerView) {
             }
             val preference = context.getSharedPreferences(key, Context.MODE_PRIVATE)
             val value = when (def) {
+                is PreferenceValue -> {
+                    def.parse(preference.getString(key, def.serialization())?: def.serialization())
+                    def
+                }
                 is String -> {
                     preference.getString(key, def)
                 }
@@ -99,9 +107,9 @@ class PreferenceHelper(private val group: RecyclerView) {
             return value as T
         }
 
-        fun findItemByKey(key: String, data: ArrayList<BasePreferenceInfo<*>>): BasePreferenceInfo<*>? {
+        fun findItemByKey(key: String, data: ArrayList<PreferenceInfo>): BasePreferenceInfo<*>? {
             for (info in data) {
-                if (info.key == key) {
+                if (info is BasePreferenceInfo<*> && info.key == key) {
                     return info
                 }
             }
@@ -113,7 +121,7 @@ class PreferenceHelper(private val group: RecyclerView) {
     private val context: Context
         get() = group.context
 
-    private val data = ArrayList<BasePreferenceInfo<*>>()
+    private val data = ArrayList<PreferenceInfo>()
 
     private val adapter: PreferenceAdapter by lazy {
         PreferenceAdapter(data)
@@ -133,8 +141,13 @@ class PreferenceHelper(private val group: RecyclerView) {
         adapter.notifyDataSetChanged()
     }
 
-    fun addItem(vararg info: BasePreferenceInfo<*>) {
-        data.addAll(info)
+    fun addItem(vararg info: PreferenceInfo) {
+        for (i in info) {
+            if (i is BasePreferenceInfo<*>) {
+                checkItem(i.key)
+            }
+            data.add(i)
+        }
     }
 
     fun removeItem(key: String) {
@@ -145,7 +158,7 @@ class PreferenceHelper(private val group: RecyclerView) {
 
     fun <T> getValue(key: String): T? {
         for (info in data) {
-            if (info.key == key) {
+            if (info is BasePreferenceInfo<*> && info.key == key) {
                 return try {
                     info.getValue(context) as T
                 } catch (e: ClassCastException) {
@@ -156,34 +169,13 @@ class PreferenceHelper(private val group: RecyclerView) {
         return null
     }
 
-    fun build(run: PreferenceHelper.() -> Unit) {
-        this.apply(run)
+    fun build(run: ItemBuilder.() -> Unit) {
+        val builder = ItemBuilder()
+        builder.apply(run)
+        for (item in builder.itemList) {
+            addItem(item)
+        }
         init()
-    }
-
-    fun number(key: String, run: NumberPreferenceInfo.() -> Unit): NumberPreferenceInfo {
-        checkItem(key)
-        return NumberPreferenceInfo(key).apply(run)
-    }
-
-    fun action(action: Intent,
-               run: ActionPreferenceInfo.() -> Unit): ActionPreferenceInfo {
-        return ActionPreferenceInfo(action).apply(run)
-    }
-
-    fun switch(key: String, run: SwitchPreferenceInfo.() -> Unit): SwitchPreferenceInfo {
-        checkItem(key)
-        return SwitchPreferenceInfo(key).apply(run)
-    }
-
-    fun colors(key: String, run: ColorsPreferenceInfo.() -> Unit): ColorsPreferenceInfo {
-        checkItem(key)
-        return ColorsPreferenceInfo(key).apply(run)
-    }
-
-    fun images(key: String, run: ImagesPreferenceInfo.() -> Unit): ImagesPreferenceInfo {
-        checkItem(key)
-        return ImagesPreferenceInfo(key).apply(run)
     }
 
     private fun checkItem(key: String) {

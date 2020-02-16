@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
 import com.lollipop.ldream.drawer.BlackHoleDrawable
 import com.lollipop.ldream.util.TimerHelper
+import com.lollipop.lpreference.PreferenceConfig
 import com.lollipop.lpreference.PreferenceHelper
+import com.lollipop.lpreference.util.changeAlpha
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
@@ -18,6 +20,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var timerHelper: TimerHelper
     private lateinit var preferenceHelper: PreferenceHelper
+
+    companion object {
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,14 +41,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun initPreference() {
         preferenceHelper.build {
-            addItem(
-                number("keyWorld") {
-                    title = "关键字"
-                    summary = "设置关键字"
-                },
-                action(Intent(Settings.ACTION_SETTINGS)) {
-                    title = "跳转到设置"
-                    summary = "跳转到设置页面"
+            add(
+                group("标题") {
+                    add(
+                        number("keyWorld") {
+                            title = "关键字"
+                            summary = "设置关键字"
+                            iconId = R.drawable.ic_add_black_24dp
+                        },
+                        action(Intent(Settings.ACTION_SETTINGS)) {
+                            title = "跳转到设置"
+                            summary = "跳转到设置页面"
+                        }
+                    )
                 },
                 switch("switch") {
                     title = "开关"

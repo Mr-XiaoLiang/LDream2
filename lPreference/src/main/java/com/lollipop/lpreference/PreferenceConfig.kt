@@ -11,10 +11,12 @@ import com.lollipop.lpreference.util.changeAlpha
  */
 object PreferenceConfig {
 
-    const val titleColor = Color.WHITE
+    var groupColor = Color.WHITE.changeAlpha(0.6F)
+
+    var titleColor = Color.WHITE
 
     val summaryColor = titleColor.changeAlpha(0.8F)
 
-    const val iconColor = titleColor
+    val iconColor = titleColor
 
 }
