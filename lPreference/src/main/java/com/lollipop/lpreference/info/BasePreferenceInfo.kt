@@ -9,7 +9,7 @@ import com.lollipop.lpreference.value.PreferenceValue
  * @date 2020-01-16 23:43
  * 基础的偏好设置信息
  */
-open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
+open class BasePreferenceInfo<T: Any>(val key: String, val default: T): PreferenceInfo {
     /**
      * 标题
      */
@@ -45,10 +45,7 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
     fun getValue(context: Context): T {
         val result = when (default) {
             is PreferenceValue -> {
-                default.parse(
-                    PreferenceHelper.get(
-                    context, key, default.serialization()))
-                default
+                PreferenceHelper.get(context, key, default)
             }
             is String -> {
                 PreferenceHelper.get(context, key, default)
@@ -79,8 +76,7 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T) {
     fun putValue(context: Context, value: T) {
         when (value) {
             is PreferenceValue -> {
-                PreferenceHelper.put(
-                    context, key, value.serialization())
+                PreferenceHelper.put(context, key, value)
             }
             is String -> {
                 PreferenceHelper.put(context, key, value)

@@ -11,6 +11,7 @@ import com.lollipop.lpreference.item.*
  */
 object PreferenceFactory {
 
+    private const val Group  = -1
     private const val Empty  = 0
     private const val Number = 1
     private const val Action = 2
@@ -18,29 +19,31 @@ object PreferenceFactory {
     private const val Colors = 4
     private const val Images = 5
 
-    fun getInfoType(info: BasePreferenceInfo<*>): Int {
+    fun getInfoType(info: PreferenceInfo): Int {
         return when (info) {
             is NumberPreferenceInfo -> Number
             is ActionPreferenceInfo -> Action
             is SwitchPreferenceInfo -> Switch
             is ColorsPreferenceInfo -> Colors
             is ImagesPreferenceInfo -> Images
+            is PreferenceGroupInfo -> Group
             else -> Empty
         }
     }
 
-    fun createItem(group: ViewGroup, type: Int): BasePreferenceItem<*> {
+    fun createItem(group: ViewGroup, type: Int): PreferenceItem<*> {
         return when(type) {
             Number -> NumberPreference(group)
             Action -> ActionPreference(group)
             Switch -> SwitchPreference(group)
             Colors -> ColorsPreference(group)
             Images -> ImagesPreference(group)
+            Group -> PreferenceGroup(group)
             else -> EmptyPreferenceItem(group)
         }
     }
 
-    fun bindItem(item: BasePreferenceItem<*>, info: BasePreferenceInfo<*>) {
+    fun bindItem(item: PreferenceItem<*>, info: PreferenceInfo) {
         when (item) {
             is NumberPreference -> if (info is NumberPreferenceInfo) {
                 item.bind(info)
@@ -57,7 +60,10 @@ object PreferenceFactory {
             is ImagesPreference -> if (info is ImagesPreferenceInfo) {
                 item.bind(info)
             }
-            is EmptyPreferenceItem -> {
+            is PreferenceGroup -> if (info is PreferenceGroupInfo) {
+                item.bind(info)
+            }
+            is EmptyPreferenceItem -> if (info is BasePreferenceInfo<*>) {
                 item.bind(info)
             }
         }

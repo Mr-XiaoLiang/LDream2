@@ -4,7 +4,9 @@ import android.text.TextUtils
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.info.BasePreferenceInfo
+import com.lollipop.lpreference.info.PreferenceInfo
 import com.lollipop.lpreference.item.BasePreferenceItem
+import com.lollipop.lpreference.item.PreferenceItem
 import com.lollipop.lpreference.item.StatusProvider
 
 /**
@@ -12,21 +14,26 @@ import com.lollipop.lpreference.item.StatusProvider
  * @date 2020-01-18 20:32
  * 偏好设置的适配器
  */
-class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
-    RecyclerView.Adapter<BasePreferenceItem<*>>() {
+class PreferenceAdapter(private val data: ArrayList<PreferenceInfo>):
+    RecyclerView.Adapter<PreferenceItem<*>>() {
 
     var onPreferenceChangeListener: ((BasePreferenceInfo<*>) -> Unit)? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreferenceItem<*> {
         val item = PreferenceFactory.createItem(parent, viewType)
-        item.init(
-            { getStatus(data[it]) },
-            {
-                val info = data[it]
-                onPreferenceChangeListener?.invoke(info)
-                checkItemStatus(info)
-            }
-        )
+        if (item is BasePreferenceItem) {
+            item.init(
+                {
+                    val info = data[it] as BasePreferenceInfo<*>
+                    getStatus(info)
+                },
+                {
+                    val info = data[it] as BasePreferenceInfo<*>
+                    onPreferenceChangeListener?.invoke(info)
+                    checkItemStatus(info)
+                }
+            )
+        }
         return item
     }
 
@@ -34,7 +41,7 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
         return data.size
     }
 
-    override fun onBindViewHolder(holder: BasePreferenceItem<*>, position: Int) {
+    override fun onBindViewHolder(holder: PreferenceItem<*>, position: Int) {
         PreferenceFactory.bindItem(holder, data[position])
     }
 
@@ -60,7 +67,7 @@ class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
         val statusValue = info.statusValue
         for (index in data.indices) {
             val item = data[index]
-            if (item == info) {
+            if (item == info || item !is BasePreferenceInfo<*>) {
                 continue
             }
             if (item.relevantKey == info.key) {
