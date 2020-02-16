@@ -3,4 +3,23 @@
     <string name="touch_view">Touch View</string>
     <string name="title_keyword">关键字</string>
     <string name="summary_keyword">高亮显示的文字</string>
+    <string name="group_display">显示</string>
+    <string name="title_primary_color">关键字颜色</string>
+    <string name="summary_primary_color">关键字将会显示为这种颜色</string>
+    <string name="title_secondary_color">普通文字颜色</string>
+    <string name="summary_secondary_color">除了关键字以外的其他文字的颜色</string>
+    <string name="group_flash">闪光</string>
+    <string name="title_flash_enable">开启闪光</string>
+    <string name="summary_flash_enable_true">将会在有状态变化时，屏幕边缘发出闪光</string>
+    <string name="summary_flash_enable_false">将不会在有状态变化时，屏幕边缘发出闪光</string>
+    <string name="title_flash_color">闪光颜色</string>
+    <string name="summary_flash_color">屏幕边缘闪光的颜色</string>
+    <string name="group_notification">消息通知</string>
+    <string name="title_notification_listener">消息通知权限</string>
+    <string name="summary_notification_listener">当无法在屏保看到通知时，请检查此权限</string>
+    <string name="title_tint_enable">统一通知颜色</string>
+    <string name="summary_tint_enable_true">将会把所有的通知图标渲染为一样的颜色</string>
+    <string name="summary_tint_enable_false">将会保留通知图标原本的颜色</string>
+    <string name="title_tint_color">通知图标颜色</string>
+    <string name="summary_tint_color">将会把所有的通知图标渲染为选中的颜色</string>
 </resources>

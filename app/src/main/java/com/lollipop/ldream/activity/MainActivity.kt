@@ -1,18 +1,12 @@
 package com.lollipop.ldream.activity
 
-import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.provider.Settings
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
 import com.lollipop.ldream.drawer.BlackHoleDrawable
-import com.lollipop.ldream.util.TimerHelper
-import com.lollipop.lpreference.PreferenceConfig
+import com.lollipop.ldream.util.*
 import com.lollipop.lpreference.PreferenceHelper
-import com.lollipop.lpreference.util.changeAlpha
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
@@ -21,16 +15,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var timerHelper: TimerHelper
     private lateinit var preferenceHelper: PreferenceHelper
 
-    companion object {
-
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        timerHelper = TimerHelper(timerView, notificationGroup, powerView)
+        timerHelper = TimerHelper(timerView, notificationGroup, powerView, backgroundView)
         preferenceHelper = PreferenceHelper(preferenceList)
         preferenceList.post {
             initPreference()
@@ -40,42 +30,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initPreference() {
-        preferenceHelper.build {
-            add(
-                group("标题") {
-                    add(
-                        number("keyWorld") {
-                            title = "关键字"
-                            summary = "设置关键字"
-                            iconId = R.drawable.ic_add_black_24dp
-                        },
-                        action(Intent(Settings.ACTION_SETTINGS)) {
-                            title = "跳转到设置"
-                            summary = "跳转到设置页面"
-                        }
-                    )
-                },
-                switch("switch") {
-                    title = "开关"
-                    summary = "打开或者关闭开关"
-                    summaryTrue = "你已经打开了开关"
-                    summaryFalse = "你已经关闭了开关"
-                },
-                colors("colors") {
-                    title = "颜色"
-                    summary = "选择主题色"
-                    maxSize = 5
-                    defaultColors = intArrayOf(Color.RED)
-                },
-                images("images") {
-                    title = "图片"
-                    summary = "选择背景图片"
-                    maxSize = 1
-                }
-            )
-        }
+        preferenceHelper.build(LDreamPreference.getPreferenceList(this))
         preferenceHelper.onPreferenceChange {
-            Toast.makeText(this, "内容被修改了：${it.key}", Toast.LENGTH_SHORT).show()
+            onPreferenceChange(it.key)
+        }
+    }
+
+    private fun onPreferenceChange(key: String) {
+        when (key) {
+            LDreamPreference.KEY_KEYWORD -> {
+                timerHelper.specialKeyword = timerKeyWord()
+                timerHelper.notifyUpdateText()
+            }
+            LDreamPreference.KEY_PRIMARY_COLOR -> {
+                timerHelper.specialKeywordColor = timerPrimaryColor()
+                timerHelper.notifyUpdateText()
+            }
+            LDreamPreference.KEY_SECONDARY_COLOR -> {
+                timerHelper.secondaryTextColor = timerSecondaryColor()
+                timerHelper.notifyUpdateText()
+            }
+            LDreamPreference.KEY_BACKGROUND -> {
+                timerHelper.backgroundUri = timerBackgroundUri()
+                timerHelper.notifyUpdateBackground()
+            }
+            LDreamPreference.KEY_FLASH_ENABLE -> {
+
+            }
+            LDreamPreference.KEY_FLASH_COLOR -> {
+
+            }
+            LDreamPreference.KEY_TINT_ENABLE -> {
+                timerHelper.isTintIcon = timerTintEnable()
+                timerHelper.notifyUpdateIcon()
+            }
+            LDreamPreference.KEY_TINT_COLOR -> {
+                timerHelper.iconTintColor = timerTintColor()
+                timerHelper.notifyUpdateIcon()
+            }
         }
     }
 

@@ -8,12 +8,18 @@ import com.lollipop.lpreference.value.ColorArray
  * @date 2020-01-18 20:38
  * 颜色偏好设置
  */
-class ColorsPreferenceInfo(key: String): BasePreferenceInfo<ColorArray>(key, ColorArray()) {
+class ColorsPreferenceInfo(key: String):
+    BasePreferenceInfo<ColorArray>(key, ColorArray()) {
 
     init {
         onValueGetter = {
             if (it.size < 1) {
                 it.addAll(*defaultColors)
+            }
+            if (maxSize > 0) {
+                while (it.size > maxSize) {
+                    it.removeAt(0)
+                }
             }
             it
         }

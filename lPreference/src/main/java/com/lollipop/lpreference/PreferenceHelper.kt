@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.info.BasePreferenceInfo
 import com.lollipop.lpreference.info.PreferenceInfo
+import com.lollipop.lpreference.value.ColorArray
+import com.lollipop.lpreference.value.ImageArray
 import com.lollipop.lpreference.value.PreferenceValue
 import com.lollipop.lpreference.view.ItemBuilder
 
@@ -114,6 +116,14 @@ class PreferenceHelper(private val group: RecyclerView) {
                 }
             }
             return null
+        }
+
+        fun getColor(context: Context, key: String, def: ColorArray): ColorArray {
+            return get(context, key, def)
+        }
+
+        fun getImage(context: Context, key: String, def: ImageArray): ImageArray {
+            return get(context, key, def)
         }
 
     }

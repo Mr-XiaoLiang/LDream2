@@ -36,11 +36,11 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
     override fun onPreviewClick(view: View): Boolean {
         super.onPreviewClick(view)
         preferenceInfo?.let { info ->
-            val size = info.values.size
-            if (size > 1) {
+            val values = info.getValue(context)
+            if (values.size > 1) {
                 selectedIndex++
-                selectedIndex %= size
-                Glide.with(imageView).load(info.values[selectedIndex]).into(imageView)
+                selectedIndex %= values.size
+                Glide.with(imageView).load(values[selectedIndex]).into(imageView)
                 return true
             }
         }
@@ -50,8 +50,9 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
     override fun onBind(info: ImagesPreferenceInfo) {
         super.onBind(info)
         selectedIndex = 0
-        if (info.values.size > 0) {
-            Glide.with(imageView).load(info.values[selectedIndex]).into(imageView)
+        val values = info.getValue(context)
+        if (values.size > 0) {
+            Glide.with(imageView).load(values[selectedIndex]).into(imageView)
         } else {
             imageView.setImageDrawable(null)
         }

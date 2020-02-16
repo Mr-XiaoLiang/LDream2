@@ -47,10 +47,14 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         private val paint = Paint().apply {
             isAntiAlias = true
             isDither = true
-            style = Paint.Style.FILL
+            style = Paint.Style.STROKE
         }
 
         private var shader: Shader? = null
+
+        private var radius = 0F
+
+        private val arcRectF = RectF()
 
         var isGradient = true
             set(value) {
@@ -74,29 +78,26 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             if (colors.size == 1) {
                 paint.color = colors[0]
                 canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    min(bounds.width(), bounds.height()) * 0.5F, paint)
+                    radius, paint)
                 return
             }
             if (isGradient) {
                 paint.shader = shader
                 canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    min(bounds.width(), bounds.height()) * 0.5F, paint)
+                    radius, paint)
             } else {
                 paint.shader = null
                 val step = 360F / colors.size
-                val centerX = bounds.exactCenterX()
-                val centerY = bounds.exactCenterY()
-                val radius = min(bounds.width(), bounds.height()) * 0.5F
-                val left = centerX - radius
-                val top = centerY - radius
-                val right = centerX + radius
-                val bottom = centerY + radius
                 for (index in 0 until colors.size) {
                     paint.color = colors[index]
-                    canvas.drawArc(left, top, right, bottom,
-                        index * step, step, true, paint)
+                    drawArc(canvas, index * step, step)
                 }
             }
+        }
+
+        private fun drawArc(canvas: Canvas, startAngle: Float, length: Float) {
+            canvas.drawArc(arcRectF,
+                startAngle, length, true, paint)
         }
 
         override fun onBoundsChange(bound: Rect?) {
@@ -105,6 +106,20 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         }
 
         private fun resetShader() {
+
+            val r = min(bounds.width(), bounds.height()) * 0.5F
+            val strokeWidth = r * 0.6F
+            paint.strokeWidth = strokeWidth
+            radius = r - (strokeWidth / 2)
+
+            val centerX = bounds.exactCenterX()
+            val centerY = bounds.exactCenterY()
+            val left = centerX - radius
+            val top = centerY - radius
+            val right = centerX + radius
+            val bottom = centerY + radius
+            arcRectF.set(left, top, right, bottom)
+
             shader = if (colors.size > 1 && bounds.width() > 0 && bounds.height() > 0) {
                 SweepGradient(bounds.exactCenterX(), bounds.exactCenterY(),
                     IntArray(colors.size + 1) { colors[it % colors.size] }, null)
