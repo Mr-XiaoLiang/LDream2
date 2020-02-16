@@ -1,12 +1,15 @@
 package com.lollipop.ldream.util
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import com.lollipop.ldream.R
 import com.lollipop.lpreference.PreferenceHelper
-import com.lollipop.lpreference.info.BasePreferenceInfo
-import com.lollipop.lpreference.info.NumberPreferenceInfo
+import com.lollipop.lpreference.util.changeAlpha
 import com.lollipop.lpreference.value.ColorArray
+import com.lollipop.lpreference.value.ImageArray
+import com.lollipop.lpreference.view.ItemBuilder
 
 /**
  * @author lollipop
@@ -15,54 +18,168 @@ import com.lollipop.lpreference.value.ColorArray
  */
 object LDreamPreference {
 
-    const val KEY_KEY_WORD = "KEY_KEY_WORD"
+    const val KEY_KEYWORD = "KEY_KEY_WORD"
     const val KEY_PRIMARY_COLOR = "KEY_PRIMARY_COLOR"
     const val KEY_SECONDARY_COLOR = "KEY_SECONDARY_COLOR"
+    const val KEY_BACKGROUND = "KEY_BACKGROUND"
+
     const val KEY_FLASH_COLOR = "KEY_FLASH_COLOR"
     const val KEY_FLASH_ENABLE = "KEY_FLASH_ENABLE"
+
     const val KEY_TINT_ENABLE = "KEY_TINT_ENABLE"
     const val KEY_TINT_COLOR = "KEY_TINT_COLOR"
 
-    fun getPreferenceList(context: Context): Array<BasePreferenceInfo<*>> {
-        return arrayOf(
-            NumberPreferenceInfo(KEY_KEY_WORD).apply { 
-                title = context.getString(R.string.title_keyword)
-                summary = context.getString(R.string.summary_keyword)
-//                iconId = R.drawable.ic_
-            }
+    const val DEF_KEYWORD = 1
+
+    val DEF_PRIMARY_COLOR = Color.RED.changeAlpha(0.8F)
+
+    val DEF_SECONDARY_COLOR = Color.WHITE.changeAlpha(0.8F)
+
+    const val DEF_FLASH_ENABLER = true
+
+    const val DEF_TINT_ENABLE = true
+
+    val DEF_TINT_COLOR = DEF_SECONDARY_COLOR
+    
+    private const val ACTION_NOTIFICATION_LISTENER_SETTINGS = 
+        "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"
+
+    val DEF_FLASH_COLOR = ColorArray().apply {
+        addAll(
+            Color.YELLOW,
+            Color.RED,
+            Color.GREEN
         )
+    }
+
+    fun getPreferenceList(context: Context): ItemBuilder.() -> Unit {
+        return {
+            add(
+                group(context.getString(R.string.group_display)) {
+                    add(
+                        number(KEY_KEYWORD, DEF_KEYWORD) {
+                            title = context.getString(R.string.title_keyword)
+                            summary = context.getString(R.string.summary_keyword)
+                            iconId = R.drawable.ic_text_fields_black_24dp
+                        },
+                        colors(KEY_PRIMARY_COLOR) {
+                            title = context.getString(R.string.title_primary_color)
+                            summary = context.getString(R.string.summary_primary_color)
+                            maxSize = 1
+                            iconId = R.drawable.ic_color_lens_black_24dp
+                            defaultColors = intArrayOf(DEF_PRIMARY_COLOR)
+                        },
+                        colors(KEY_SECONDARY_COLOR) {
+                            title = context.getString(R.string.title_secondary_color)
+                            summary = context.getString(R.string.summary_secondary_color)
+                            iconId = R.drawable.ic_color_lens_black_24dp
+                            maxSize = 1
+                            defaultColors = intArrayOf(DEF_SECONDARY_COLOR)
+                        },
+                        images(KEY_BACKGROUND) {
+                            title = "背景图片"
+                            summary = "时间的背景图片"
+                            maxSize = 1
+                            iconId = R.drawable.ic_image_black_24dp
+                        }
+                    )
+                },
+                group(context.getString(R.string.group_flash)) {
+                    add(
+                        switch(KEY_FLASH_ENABLE, DEF_FLASH_ENABLER) {
+                            title = context.getString(R.string.title_flash_enable)
+                            summaryTrue = context.getString(R.string.summary_flash_enable_true)
+                            summaryFalse = context.getString(R.string.summary_flash_enable_false)
+                            iconId = R.drawable.ic_flash_on_black_24dp
+                        },
+                        colors(KEY_FLASH_COLOR) {
+                            relevantKey = KEY_FLASH_ENABLE
+                            relevantEnable = true
+                            title = context.getString(R.string.title_flash_color)
+                            summary = context.getString(R.string.summary_flash_color)
+                            defaultColors = IntArray(DEF_FLASH_COLOR.size) { DEF_FLASH_COLOR[it] }
+                            iconId = R.drawable.ic_color_lens_black_24dp
+                        }
+                    )
+                },
+                group(context.getString(R.string.group_notification)) {
+                    add(
+                        action(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS)) {
+                            title = context.getString(R.string.title_notification_listener)
+                            summary = context.getString(R.string.summary_notification_listener)
+                            iconId = R.drawable.ic_notifications_none_black_24dp
+                        },
+                        switch(KEY_TINT_ENABLE, DEF_TINT_ENABLE) {
+                            title = context.getString(R.string.title_tint_enable)
+                            summaryTrue = context.getString(R.string.summary_tint_enable_true)
+                            summaryFalse = context.getString(R.string.summary_tint_enable_false)
+                            iconId = R.drawable.ic_format_color_fill_black_24dp
+                        },
+                        colors(KEY_TINT_COLOR) {
+                            relevantKey = KEY_TINT_ENABLE
+                            relevantEnable = true
+                            title = context.getString(R.string.title_tint_color)
+                            summary = context.getString(R.string.summary_tint_color)
+                            defaultColors = intArrayOf(DEF_TINT_COLOR)
+                            maxSize = 1
+                            iconId = R.drawable.ic_color_lens_black_24dp
+                        }
+                    )
+                }
+            )
+        }
     }
 
 }
 
 fun Context.timerPrimaryColor(): Int {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_PRIMARY_COLOR, Color.RED)
+    val colors = PreferenceHelper.getColor(this, LDreamPreference.KEY_PRIMARY_COLOR, ColorArray())
+    if (colors.size < 1) {
+        return LDreamPreference.DEF_PRIMARY_COLOR
+    }
+    return colors[0]
 }
 
 fun Context.timerSecondaryColor(): Int {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_SECONDARY_COLOR, Color.WHITE)
+    val colors = PreferenceHelper.getColor(this, LDreamPreference.KEY_SECONDARY_COLOR, ColorArray())
+    if (colors.size < 1) {
+        return LDreamPreference.DEF_SECONDARY_COLOR
+    }
+    return colors[0]
 }
 
-fun Context.timerKeyWord(): Int {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_KEY_WORD, 1)
+fun Context.timerKeyWord(): String {
+    return PreferenceHelper.get(this, LDreamPreference.KEY_KEYWORD,
+        LDreamPreference.DEF_KEYWORD).toString()
 }
 
-fun Context.timerFlashColor(): ColorArray {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_FLASH_COLOR, ColorArray())
+fun Context.timerFlashColor(value: ColorArray? = null): ColorArray {
+    return PreferenceHelper.getColor(this, LDreamPreference.KEY_FLASH_COLOR,
+        value?:LDreamPreference.DEF_FLASH_COLOR.newInstance())
 }
 
 fun Context.timerFlashEnable(): Boolean {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_FLASH_ENABLE, true)
+    return PreferenceHelper.get(this, LDreamPreference.KEY_FLASH_ENABLE,
+        LDreamPreference.DEF_FLASH_ENABLER)
 }
 
 fun Context.timerTintEnable(): Boolean {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_TINT_ENABLE, true)
+    return PreferenceHelper.get(this, LDreamPreference.KEY_TINT_ENABLE,
+        LDreamPreference.DEF_TINT_ENABLE)
 }
 
 fun Context.timerTintColor(): Int {
-    val colors = PreferenceHelper.get(this, LDreamPreference.KEY_TINT_COLOR, ColorArray())
+    val colors = PreferenceHelper.getColor(this, LDreamPreference.KEY_TINT_COLOR, ColorArray())
     if (colors.size < 1) {
-        return Color.WHITE
+        return LDreamPreference.DEF_TINT_COLOR
     }
     return colors[0]
+}
+
+fun Context.timerBackgroundUri(): Uri? {
+    val images = PreferenceHelper.getImage(this, LDreamPreference.KEY_BACKGROUND, ImageArray())
+    if (images.size < 1) {
+        return null
+    }
+    return images[0]
 }

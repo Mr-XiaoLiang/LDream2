@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.drawable.IconCompat
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
 import com.lollipop.ldream.NotificationService
 import com.lollipop.ldream.R
@@ -32,7 +34,8 @@ import kotlin.collections.ArrayList
  */
 class TimerHelper(private val timeView: TextView,
                   private val notificationGroup: FlexboxLayout,
-                  private val powerView: TextView): BroadcastReceiver() {
+                  private val powerView: TextView,
+                  private val backgroundView: ImageView): BroadcastReceiver() {
 
     companion object {
         private const val UPDATE_DELAYED = 400L
@@ -43,6 +46,11 @@ class TimerHelper(private val timeView: TextView,
 
     var specialKeyword = "1"
     var specialKeywordColor = Color.RED
+    var backgroundUri: Uri? = null
+    var secondaryTextColor = Color.WHITE
+    var isTintIcon = false
+    var iconTintColor = Color.WHITE
+
     var isRunning = false
         private set
 
@@ -69,6 +77,12 @@ class TimerHelper(private val timeView: TextView,
     init {
         timeView.setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
         powerView.setTypefaceForName("fonts/time_font.otf")
+        specialKeyword = timeView.context.timerKeyWord().toString()
+        specialKeywordColor = timeView.context.timerPrimaryColor()
+        backgroundUri = backgroundView.context.timerBackgroundUri()
+        secondaryTextColor = timeView.context.timerSecondaryColor()
+        isTintIcon = notificationGroup.context.timerTintEnable()
+        iconTintColor = notificationGroup.context.timerTintColor()
     }
 
     private val updateTask = Runnable {
@@ -80,6 +94,7 @@ class TimerHelper(private val timeView: TextView,
     }
 
     private fun TextView.setValue(str: String) {
+        setTextColor(secondaryTextColor)
         if (str.contains(specialKeyword)) {
             val spannableString = SpannableString(str)
             var index: Int = str.indexOf(specialKeyword)
@@ -113,6 +128,7 @@ class TimerHelper(private val timeView: TextView,
         val minute = calender.get(Calendar.MINUTE).format()
         timeView.setValue("$hour:$minute")
         if (isRunning) {
+            handler.removeCallbacks(updateTask)
             handler.postDelayed(updateTask, UPDATE_DELAYED)
         }
     }
@@ -127,13 +143,45 @@ class TimerHelper(private val timeView: TextView,
         powerView.setValue(power)
     }
 
+    private fun updateBackground() {
+        if (backgroundUri != null) {
+            Glide.with(backgroundView).load(backgroundUri).into(backgroundView)
+        } else {
+            backgroundView.setImageDrawable(null)
+        }
+    }
+
+    private fun updateNotificationIcon() {
+        for (i in notificationViewList.indices) {
+            notificationViewList[i].onBind(notificationList[i])
+        }
+    }
+
+    fun notifyUpdateText() {
+        updateTimer()
+        updateBattery()
+    }
+
+    fun notifyUpdateBackground() {
+        updateBackground()
+    }
+
+    fun notifyUpdateIcon() {
+        updateNotificationIcon()
+    }
+
+    fun notifyUpdateAll() {
+        notifyUpdateText()
+        notifyUpdateBackground()
+        notifyUpdateIcon()
+    }
+
     fun onStart() {
         if (isRunning) {
             return
         }
         isRunning = true
-        updateTimer()
-        updateBattery()
+        notifyUpdateAll()
         initNotifications()
         context.registerReceiver(this, intentFilter)
     }
@@ -170,9 +218,7 @@ class TimerHelper(private val timeView: TextView,
         while (notificationViewList.size > notificationList.size) {
             recycleViewList.add(notificationViewList.removeAt(0))
         }
-        for (i in notificationViewList.indices) {
-            notificationViewList[i].onBind(notificationList[i])
-        }
+        updateNotificationIcon()
     }
 
     private fun onNotificationPosted(pkg: String, icon: IconCompat) {
@@ -262,9 +308,16 @@ class TimerHelper(private val timeView: TextView,
 
         var pkg: String = ""
 
+        var tintColor = Color.WHITE
+        var tintEnable = true
+
         fun onBind(info: NotificationService.Info) {
             pkg = info.pkg
-            iconView.setImageDrawable(info.icon.setTint(Color.WHITE).loadDrawable(view.context))
+            iconView.setImageDrawable(info.icon.apply {
+                if (tintEnable) {
+                    setTint(tintColor)
+                }
+            }.loadDrawable(view.context))
         }
 
     }

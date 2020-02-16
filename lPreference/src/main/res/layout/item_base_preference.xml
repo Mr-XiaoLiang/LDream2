@@ -25,7 +25,6 @@
         android:layout_height="32dp"
         android:scaleType="fitXY"
         android:padding="4dp"
-        android:background="@drawable/bg_preference_icon"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@id/titleView"

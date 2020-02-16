@@ -28,6 +28,14 @@ class ColorArray: PreferenceValue {
         valueArray.clear()
     }
 
+    fun removeAt(index: Int) {
+        valueArray.removeAt(index)
+    }
+
+    fun remove(color: Int) {
+        valueArray.remove(color)
+    }
+
     fun addAll(colors: ArrayList<Int>) {
         valueArray.addAll(colors)
     }
@@ -78,6 +86,12 @@ class ColorArray: PreferenceValue {
 
     operator fun iterator(): Iterator<Int> {
         return valueArray.iterator()
+    }
+
+    fun newInstance(): ColorArray {
+        val array = ColorArray()
+        array.addAll(valueArray)
+        return array
     }
 
 }

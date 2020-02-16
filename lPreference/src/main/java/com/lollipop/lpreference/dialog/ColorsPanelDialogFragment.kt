@@ -318,21 +318,29 @@ class ColorsPanelDialogFragment: BaseDialog(),
             onActionSelected(ItemAdapter.getAction(holder))
             return true
         }
+        val position = holder.adapterPosition
+        val color = shownData[position]
         if (isEditMode) {
-            val color = shownData[holder.adapterPosition]
             itemAdapter.removeItem(color)
             selectedData.remove(color)
             updateSelectedItem()
             return false
         }
-        val position = holder.adapterPosition
-        val color = shownData[position]
         for (index in selectedData.indices) {
             if (selectedData[index] == color) {
                 selectedData.removeAt(index)
                 updateSelectedItem(index)
                 return true
             }
+        }
+        if (maxSelected  == 1) {
+            while (selectedData.size > 0) {
+                val old = shownData.indexOf(selectedData.removeAt(0))
+                itemAdapter.notifyItemChanged(old)
+            }
+            selectedData.add(color)
+            updateSelectedItem(0)
+            return true
         }
         if (maxSelected > 0 && selectedData.size >= maxSelected) {
             return false

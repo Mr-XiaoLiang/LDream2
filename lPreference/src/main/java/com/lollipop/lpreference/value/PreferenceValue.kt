@@ -9,5 +9,4 @@ interface PreferenceValue {
 
     fun serialization(): String
     fun parse(value: String)
-
 }

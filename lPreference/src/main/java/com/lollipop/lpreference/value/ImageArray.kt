@@ -57,7 +57,7 @@ class ImageArray: PreferenceValue {
         if (value.isEmpty()) {
             return
         }
-        val values = value.split(":")
+        val values = value.split(";")
         for (index in values.indices) {
             try {
                 val color = Uri.parse(values[index])
@@ -71,7 +71,7 @@ class ImageArray: PreferenceValue {
         val builder = StringBuilder()
         for (index in list.indices) {
             if (index > 0) {
-                builder.append(":")
+                builder.append(";")
             }
             builder.append(list[index].toString())
         }
