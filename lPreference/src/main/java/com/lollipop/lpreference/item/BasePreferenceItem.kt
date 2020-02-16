@@ -169,6 +169,7 @@ abstract class BasePreferenceItem <T : BasePreferenceInfo<*>> (group: ViewGroup)
         itemView.isEnabled = isEnable
         titleView.setStatus(isEnable)
         summaryView.setStatus(isEnable)
+        iconView.alpha = if (isEnable) { 1F } else { 0.5F }
         onStatusChange(isEnable)
     }
 

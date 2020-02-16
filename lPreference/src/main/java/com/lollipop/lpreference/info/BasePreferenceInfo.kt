@@ -39,6 +39,8 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T): Preferen
      */
     var relevantEnable = true
 
+    protected var lastValue: T = default
+
     protected var onValueGetter: ((T) -> T)? = null
 
     @Suppress("UNCHECKED_CAST")
@@ -70,10 +72,12 @@ open class BasePreferenceInfo<T: Any>(val key: String, val default: T): Preferen
                         "please Implementing the PreferenceValue interface")
             }
         } as T
+        lastValue = result
         return onValueGetter?.invoke(result)?:result
     }
 
     fun putValue(context: Context, value: T) {
+        lastValue = value
         when (value) {
             is PreferenceValue -> {
                 PreferenceHelper.put(context, key, value)

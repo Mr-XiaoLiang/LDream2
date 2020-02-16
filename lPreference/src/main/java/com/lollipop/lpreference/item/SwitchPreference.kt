@@ -4,7 +4,6 @@ import android.text.TextUtils
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.info.SwitchPreferenceInfo
 
