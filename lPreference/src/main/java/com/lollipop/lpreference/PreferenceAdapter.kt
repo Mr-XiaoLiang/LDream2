@@ -72,8 +72,8 @@ class PreferenceAdapter(private val data: ArrayList<PreferenceInfo>):
             }
             if (item.relevantKey == info.key) {
                 item.enable = item.relevantEnable == statusValue
+                notifyItemChanged(index)
             }
-            notifyItemChanged(index)
         }
     }
 
