@@ -7,6 +7,7 @@ import android.util.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.info.*
+import java.lang.ClassCastException
 
 /**
  * @author lollipop
@@ -118,6 +119,10 @@ class PreferenceHelper(private val group: RecyclerView) {
         PreferenceAdapter(data)
     }
 
+    fun onPreferenceChange(listener:  ((BasePreferenceInfo<*>) -> Unit)?) {
+        adapter.onPreferenceChangeListener = listener
+    }
+
     private fun init() {
         if (group.layoutManager == null) {
             group.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -136,6 +141,19 @@ class PreferenceHelper(private val group: RecyclerView) {
         findItemByKey(key)?.let {
             data.remove(it)
         }
+    }
+
+    fun <T> getValue(key: String): T? {
+        for (info in data) {
+            if (info.key == key) {
+                return try {
+                    info.getValue(context) as T
+                } catch (e: ClassCastException) {
+                    null
+                }
+            }
+        }
+        return null
     }
 
     fun build(run: PreferenceHelper.() -> Unit) {

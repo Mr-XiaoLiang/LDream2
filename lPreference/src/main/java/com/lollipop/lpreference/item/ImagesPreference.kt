@@ -25,7 +25,7 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
     override fun onItemClick(view: View) {
         super.onItemClick(view)
         preferenceInfo?.let { info ->
-            ImagesPanelDialogFragment.show(context, info.values.getList()) {
+            ImagesPanelDialogFragment.show(context, info.values.getList(), info.maxSize) {
                 info.onImageChange(it)
                 info.save(context)
                 notifyInfoChange()
