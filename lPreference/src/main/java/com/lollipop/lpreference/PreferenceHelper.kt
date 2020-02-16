@@ -163,6 +163,11 @@ class PreferenceHelper(private val group: RecyclerView) {
         return ColorsPreferenceInfo(key).apply(run)
     }
 
+    fun images(key: String, run: ImagesPreferenceInfo.() -> Unit): ImagesPreferenceInfo {
+        checkItem(key)
+        return ImagesPreferenceInfo(key).apply(run)
+    }
+
     private fun checkItem(key: String) {
         if (findItemByKey(key) != null) {
             throw RuntimeException("Already contains an item with the same key")
