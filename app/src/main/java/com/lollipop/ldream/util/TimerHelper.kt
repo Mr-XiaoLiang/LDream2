@@ -153,7 +153,10 @@ class TimerHelper(private val timeView: TextView,
 
     private fun updateNotificationIcon() {
         for (i in notificationViewList.indices) {
-            notificationViewList[i].onBind(notificationList[i])
+            val holder = notificationViewList[i]
+            holder.tintColor = iconTintColor
+            holder.tintEnable = isTintIcon
+            holder.onBind(notificationList[i])
         }
     }
 
@@ -316,6 +319,8 @@ class TimerHelper(private val timeView: TextView,
             iconView.setImageDrawable(info.icon.apply {
                 if (tintEnable) {
                     setTint(tintColor)
+                } else {
+                    setTintList(null)
                 }
             }.loadDrawable(view.context))
         }
