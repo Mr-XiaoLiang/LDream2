@@ -12,9 +12,10 @@ import com.lollipop.lpreference.item.StatusProvider
  * @date 2020-01-18 20:32
  * 偏好设置的适配器
  */
-class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>,
-                        private val onPreferenceChangeListener: ((BasePreferenceInfo<*>) -> Unit)? = null):
+class PreferenceAdapter(private val data: ArrayList<BasePreferenceInfo<*>>):
     RecyclerView.Adapter<BasePreferenceItem<*>>() {
+
+    var onPreferenceChangeListener: ((BasePreferenceInfo<*>) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePreferenceItem<*> {
         val item = PreferenceFactory.createItem(parent, viewType)

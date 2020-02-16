@@ -5,16 +5,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
-import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
+import com.lollipop.ldream.drawer.BlackHoleDrawable
 import com.lollipop.ldream.util.TimerHelper
 import com.lollipop.lpreference.PreferenceHelper
-import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
-import com.lollipop.lpreference.dialog.ImagesPanelDialogFragment
-import com.lollipop.lpreference.util.ScaleImageHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_timer.*
 
@@ -33,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         preferenceList.post {
             initPreference()
         }
+        timerGroup.background = BlackHoleDrawable()
+        backgroundView.setImageResource(R.drawable.ic_launcher_background)
     }
 
     private fun initPreference() {
@@ -57,21 +55,23 @@ class MainActivity : AppCompatActivity() {
                     summary = "选择主题色"
                     maxSize = 5
                     defaultColors = intArrayOf(Color.RED)
+                },
+                images("images") {
+                    title = "图片"
+                    summary = "选择背景图片"
+                    maxSize = 1
                 }
             )
+        }
+        preferenceHelper.onPreferenceChange {
+            Toast.makeText(this, "内容被修改了：${it.key}", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-//                onBackPressed()
-//                ColorsPanelDialogFragment.show(this, IntArray(0), 5) {
-//                    Toast.makeText(this, "选中了${it.size}个颜色", Toast.LENGTH_SHORT).show()
-//                }
-                ImagesPanelDialogFragment.show(this) {
-                    Toast.makeText(this, "选中了${it.size}个图片", Toast.LENGTH_SHORT).show()
-                }
+                onBackPressed()
                 return true
             }
         }

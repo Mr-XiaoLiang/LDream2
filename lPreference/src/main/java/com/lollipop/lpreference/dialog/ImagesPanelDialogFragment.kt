@@ -30,10 +30,11 @@ class ImagesPanelDialogFragment : BaseDialog() {
         private const val SPAN_COUNT = 4
         private const val REQUEST_PERMISSION_READ = 233
 
-        fun show(context: Context, selected: ArrayList<Uri>? = null,
+        fun show(context: Context, selected: ArrayList<Uri>? = null, max: Int = -1,
                  callback: (Array<Uri>) -> Unit) {
             ImagesPanelDialogFragment().apply {
                 selectedImagesCallback = callback
+                maxSize = max
                 selected?.let { info ->
                     presetUriList.addAll(info)
                 }
