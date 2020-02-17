@@ -50,6 +50,10 @@ class ColorArray: PreferenceValue {
         }
     }
 
+    fun values(): ArrayList<Int> {
+        return valueArray
+    }
+
     override fun serialization(): String {
         return listToString(valueArray)
     }

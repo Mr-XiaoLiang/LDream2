@@ -77,7 +77,7 @@ class TimerHelper(private val timeView: TextView,
     init {
         timeView.setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
         powerView.setTypefaceForName("fonts/time_font.otf")
-        specialKeyword = timeView.context.timerKeyWord().toString()
+        specialKeyword = timeView.context.timerKeyWord()
         specialKeywordColor = timeView.context.timerPrimaryColor()
         backgroundUri = backgroundView.context.timerBackgroundUri()
         secondaryTextColor = timeView.context.timerSecondaryColor()
