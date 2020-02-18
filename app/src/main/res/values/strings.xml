@@ -22,4 +22,8 @@
     <string name="summary_tint_enable_false">将会保留通知图标原本的颜色</string>
     <string name="title_tint_color">通知图标颜色</string>
     <string name="summary_tint_color">将会把所有的通知图标渲染为选中的颜色</string>
+    <string name="title_background">背景图片</string>
+    <string name="summary_background">时间的背景图片</string>
+    <string name="title_test_flash">测试闪光</string>
+    <string name="summary_test_flash">点击后将会随机添加一种闪光</string>
 </resources>
