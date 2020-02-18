@@ -50,7 +50,8 @@ class FlashDrawable: Drawable() {
             field = value
             invalidateSelf()
         }
-    val flashLocations = ArrayList<Int>()
+
+    private val flashLocations = ArrayList<Int>()
 
     private val colors = ArrayList<Int>()
 
@@ -68,6 +69,17 @@ class FlashDrawable: Drawable() {
     fun setColor(array: ArrayList<Int>) {
         colors.clear()
         colors.addAll(array)
+    }
+
+    fun clear() {
+        flashLocations.clear()
+    }
+
+    fun setLocations(array: IntArray) {
+        clear()
+        array.forEach {
+            flashLocations.add(it)
+        }
     }
 
     override fun draw(canvas: Canvas) {
