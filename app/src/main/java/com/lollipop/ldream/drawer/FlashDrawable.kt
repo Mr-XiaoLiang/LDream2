@@ -14,14 +14,18 @@ class FlashDrawable: Drawable() {
 
     companion object {
 
-        private const val PRECISION = 10000
-        private const val VALUE = 0x1 shl 16
-        private const val SYMBOL = VALUE shl 1
+        private const val PRECISION = 1000
+        private const val VALUE = 0xFFFF
+        private const val SYMBOL = 0x1 shl 17
+        private const val POSITIVE = 0x1 shl 18
 
-        fun makeLocation(offset: Float, isHorizontal: Boolean): Int {
-            val value = (offset.range(0F, 1F) * PRECISION).roundToInt() and VALUE
+        fun makeLocation(offset: Float, isHorizontal: Boolean, isPositive: Boolean): Int {
+            var value = (offset.range(0F, 1F) * PRECISION).roundToInt() and VALUE
             if (isHorizontal) {
-                return value or SYMBOL
+                value = value or SYMBOL
+            }
+            if (isPositive) {
+                value = value or POSITIVE
             }
             return value
         }
@@ -32,6 +36,10 @@ class FlashDrawable: Drawable() {
 
         fun isHorizontal(location: Int): Boolean {
             return (location and SYMBOL) > 0
+        }
+
+        fun isPositive(location: Int): Boolean {
+            return (location and POSITIVE) > 0
         }
 
     }
@@ -85,33 +93,38 @@ class FlashDrawable: Drawable() {
     override fun draw(canvas: Canvas) {
         for (location in flashLocations) {
             val offset = getOffset(location)
+            var pro = progress
+            if (isPositive(location)) {
+                pro *= -1
+            }
             if (isHorizontal(location)) {
-                drawHorizontal(canvas, offset)
+                drawHorizontal(canvas, offset, pro)
             } else {
-                drawVertical(canvas, offset)
+                drawVertical(canvas, offset, pro)
             }
         }
     }
 
-    private fun drawHorizontal(canvas: Canvas, offset: Float) {
+    private fun drawHorizontal(canvas: Canvas, offset: Float, pro: Float) {
         horizontalShader?:return
         paint.shader = horizontalShader
-        val x = width * progress
-        val y = height * offset + bounds.top - (strokeWidth * 0.5F)
+        val x = width * pro
+        val y = height * offset + bounds.top
         canvas.save()
         canvas.translate(x, 0F)
         canvas.drawLine(bounds.left.toFloat(), y, bounds.right.toFloat(), y, paint)
         canvas.restore()
     }
 
-    private fun drawVertical(canvas: Canvas, offset: Float) {
+    private fun drawVertical(canvas: Canvas, offset: Float, pro: Float) {
         verticalShader?:return
         paint.shader = verticalShader
-        val x = width * offset + bounds.left - (strokeWidth * 0.5F)
-        val y = height * progress
+        val x = width * offset + bounds.left
+        val y = height * pro
         canvas.save()
         canvas.translate(0F, y)
         canvas.drawLine(x, bounds.top.toFloat(), x, bounds.bottom.toFloat(), paint)
+        canvas.restore()
     }
 
     override fun onBoundsChange(bounds: Rect?) {

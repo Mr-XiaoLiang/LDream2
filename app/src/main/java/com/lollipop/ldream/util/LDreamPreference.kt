@@ -1,11 +1,14 @@
 package com.lollipop.ldream.util
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
 import com.lollipop.ldream.R
 import com.lollipop.lpreference.PreferenceHelper
+import com.lollipop.lpreference.info.ActionPreferenceInfo
 import com.lollipop.lpreference.util.changeAlpha
 import com.lollipop.lpreference.value.ColorArray
 import com.lollipop.lpreference.value.ImageArray
@@ -44,12 +47,30 @@ object LDreamPreference {
     private const val ACTION_NOTIFICATION_LISTENER_SETTINGS = 
         "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"
 
+    private const val ACTION_TEST_FLASH = "ACTION_TEST_FLASH"
+
+    private val testFlashFilter: IntentFilter by lazy {
+        IntentFilter().apply {
+            addAction(ACTION_TEST_FLASH)
+        }
+    }
+
     val DEF_FLASH_COLOR = ColorArray().apply {
         addAll(
             Color.YELLOW,
             Color.RED,
             Color.GREEN
         )
+    }
+
+    fun registerFlashTest(context: Context, run: () -> Unit): BroadcastReceiver {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                run.invoke()
+            }
+        }
+        context.registerReceiver(receiver, testFlashFilter)
+        return receiver
     }
 
     fun getPreferenceList(context: Context): ItemBuilder.() -> Unit {
@@ -77,8 +98,8 @@ object LDreamPreference {
                             defaultColors = intArrayOf(DEF_SECONDARY_COLOR)
                         },
                         images(KEY_BACKGROUND) {
-                            title = "背景图片"
-                            summary = "时间的背景图片"
+                            title = context.getString(R.string.title_background)
+                            summary = context.getString(R.string.summary_background)
                             maxSize = 1
                             iconId = R.drawable.ic_image_black_24dp
                         }
@@ -99,6 +120,14 @@ object LDreamPreference {
                             summary = context.getString(R.string.summary_flash_color)
                             defaultColors = IntArray(DEF_FLASH_COLOR.size) { DEF_FLASH_COLOR[it] }
                             iconId = R.drawable.ic_color_lens_black_24dp
+                        },
+                        action(Intent(ACTION_TEST_FLASH)) {
+                            relevantKey = KEY_FLASH_ENABLE
+                            relevantEnable = true
+                            title = context.getString(R.string.title_test_flash)
+                            summary = context.getString(R.string.summary_test_flash)
+                            iconId = R.drawable.ic_notifications_none_black_24dp
+                            actionType = ActionPreferenceInfo.ActionType.Broadcast
                         }
                     )
                 },

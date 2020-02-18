@@ -5,11 +5,13 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import com.lollipop.ldream.drawer.FlashDrawable
 import java.util.*
-import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -30,6 +32,8 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
 
     private val minDelay = 100L * 5
 
+    private val flashDuration = 100L * 10
+
     private val handler: Handler by lazy {
         Handler(Looper.getMainLooper())
     }
@@ -37,6 +41,8 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
     private val random: Random by lazy { Random() }
 
     private val animator = ValueAnimator.ofFloat(-1F, 1F).apply {
+        duration = flashDuration
+        interpolator = AccelerateInterpolator()
         addUpdateListener(this@FlashHelper)
         addListener(this@FlashHelper)
     }
@@ -67,16 +73,20 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         unbind()
         view.background = flashDrawable
         bindView = view
+        init(view.context)
     }
 
     fun bindToImage(view: ImageView) {
         unbind()
         view.setImageDrawable(flashDrawable)
         bindView = view
+        init(view.context)
     }
 
     fun init(context: Context) {
         flashEnable = context.timerFlashEnable()
+        flashDrawable.strokeWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 3F, context.resources.displayMetrics)
         updateInfo(context)
     }
 
@@ -93,8 +103,10 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
     }
 
     fun postDefault(isHorizontal: Boolean = false) {
-        postFlash(FlashDrawable.makeLocation(0F, isHorizontal),
-            FlashDrawable.makeLocation(1F, isHorizontal))
+        val o = random.nextBoolean()
+        postFlash(FlashDrawable.makeLocation(0F, !isHorizontal, o),
+            FlashDrawable.makeLocation(1F, !isHorizontal, !o))
+
     }
 
     fun postRandom(size: Int) {
@@ -102,21 +114,28 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         for (i in 0 until size) {
             tasks[i] = FlashDrawable.makeLocation(
                 random.nextFloat().range(0F, 1F),
+                random.nextBoolean(),
                 random.nextBoolean())
         }
         postFlash(*tasks)
     }
 
-    fun postFlash(vararg locations: Int) {
+    private fun postFlash(vararg locations: Int) {
         pendingTask.add(FlashTask(locations))
         startFlash()
+    }
+
+    fun stop() {
+        handler.removeCallbacks(flashLauncher)
+        pendingTask.clear()
+        animator.cancel()
     }
 
     private fun startFlash() {
         if (animator.isRunning) {
             return
         }
-        val delay = max(0, System.currentTimeMillis() - lastFlashTime - minDelay)
+        val delay = min(0, lastFlashTime + minDelay - System.currentTimeMillis())
         handler.postDelayed(flashLauncher, delay)
     }
 
