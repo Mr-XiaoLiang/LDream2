@@ -34,9 +34,7 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         Handler(Looper.getMainLooper())
     }
 
-    private val random: Random by lazy {
-        Random()
-    }
+    private val random: Random by lazy { Random() }
 
     private val animator = ValueAnimator.ofFloat(-1F, 1F).apply {
         addUpdateListener(this@FlashHelper)
