@@ -74,6 +74,10 @@ class TimerHelper(private val timeView: TextView,
     private val notificationViewList = ArrayList<IconHolder>()
     private val recycleViewList = LinkedList<IconHolder>()
 
+    private var onBatteryChangeListener: (() -> Unit)? = null
+
+    private var onNotificationChangeListener: ((Int) -> Unit)? = null
+
     init {
         timeView.setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
         powerView.setTypefaceForName("fonts/time_font.otf")
@@ -91,6 +95,14 @@ class TimerHelper(private val timeView: TextView,
 
     private fun TextView.setTypefaceForName(name: String) {
         typeface = Typeface.createFromAsset(context.assets, name)
+    }
+
+    fun onBatteryChange(lis: () -> Unit) {
+        onBatteryChangeListener = lis
+    }
+
+    fun onNotificationChange(lis: (Int) -> Unit) {
+        onNotificationChangeListener = lis
     }
 
     private fun TextView.setValue(str: String) {
@@ -279,16 +291,19 @@ class TimerHelper(private val timeView: TextView,
         context?:return
         when (intent?.action) {
             ACTION_BATTERY_CHANGED -> {
+                onBatteryChangeListener?.invoke()
                 updateBattery()
             }
             ACTION_NOTIFICATION_POSTED -> {
                 val icon = intent.getNotificationIcon()?:return
                 val pkg = intent.getNotificationPkg()?:return
                 onNotificationPosted(pkg, icon)
+                onNotificationChangeListener?.invoke(notificationList.size)
             }
             ACTION_NOTIFICATION_REMOVED -> {
                 val pkg = intent.getNotificationPkg()?:return
                 onNotificationRemoved(pkg)
+                onNotificationChangeListener?.invoke(notificationList.size)
             }
         }
     }

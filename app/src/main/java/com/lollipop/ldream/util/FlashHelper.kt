@@ -32,7 +32,7 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
 
     private val minDelay = 100L * 5
 
-    private val flashDuration = 100L * 10
+    private val flashDuration = 100L * 8
 
     private val handler: Handler by lazy {
         Handler(Looper.getMainLooper())
