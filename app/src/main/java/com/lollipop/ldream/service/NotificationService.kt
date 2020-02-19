@@ -1,4 +1,4 @@
-package com.lollipop.ldream
+package com.lollipop.ldream.service
 
 import android.app.Notification
 import android.content.Intent
@@ -58,7 +58,12 @@ class NotificationService : NotificationListenerService() {
                 val resultList = ArrayList<Info>()
                 for (info in notificationList) {
                     val icon = IconCompat.createFromBundle(info.icon)?:continue
-                    resultList.add(Info(info.pkg, icon))
+                    resultList.add(
+                        Info(
+                            info.pkg,
+                            icon
+                        )
+                    )
                 }
                 return resultList
             }
@@ -72,7 +77,12 @@ class NotificationService : NotificationListenerService() {
                         return
                     }
                 }
-                notificationList.add(NotificationInfo(pkg, icon.toBundle()))
+                notificationList.add(
+                    NotificationInfo(
+                        pkg,
+                        icon.toBundle()
+                    )
+                )
             }
         }
 

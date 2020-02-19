@@ -1,0 +1,2 @@
+<dream xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="liang.lollipop.ldream/com.lollipop.ldream.activity.MainActivity" />

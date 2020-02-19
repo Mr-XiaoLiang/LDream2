@@ -22,7 +22,7 @@ import android.widget.TextView
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
-import com.lollipop.ldream.NotificationService
+import com.lollipop.ldream.service.NotificationService
 import com.lollipop.ldream.R
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,6 +53,11 @@ class TimerHelper(private val timeView: TextView,
 
     var isRunning = false
         private set
+
+    val notificationSize: Int
+        get() {
+            return notificationList.size
+        }
 
     private val context: Context
         get() = timeView.context
