@@ -90,14 +90,14 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
                 val step = 360F / colors.size
                 for (index in 0 until colors.size) {
                     paint.color = colors[index]
-                    drawArc(canvas, index * step, step)
+                    drawArc(canvas, (index * step) - (step / 2), step)
                 }
             }
         }
 
         private fun drawArc(canvas: Canvas, startAngle: Float, length: Float) {
             canvas.drawArc(arcRectF,
-                startAngle, length, true, paint)
+                startAngle, length, false, paint)
         }
 
         override fun onBoundsChange(bound: Rect?) {
