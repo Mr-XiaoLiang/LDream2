@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
-import com.lollipop.lpreference.info.ActionPreferenceInfo
 import com.lollipop.lpreference.info.ColorsPreferenceInfo
 import com.lollipop.lpreference.view.ColorWheelView
 
@@ -33,6 +32,9 @@ class ColorsPreference(group: ViewGroup): BasePreferenceItem<ColorsPreferenceInf
 
     override fun onPreviewClick(view: View): Boolean {
         super.onPreviewClick(view)
+        if (preferenceInfo?.maxSize?:1 == 1) {
+            return false
+        }
         colorsView.isGradient = !colorsView.isGradient
         return true
     }
