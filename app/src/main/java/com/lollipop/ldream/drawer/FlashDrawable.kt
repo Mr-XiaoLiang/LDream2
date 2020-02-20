@@ -106,7 +106,6 @@ class FlashDrawable: Drawable() {
     }
 
     private fun drawHorizontal(canvas: Canvas, offset: Float, pro: Float) {
-        horizontalShader?:return
         paint.shader = horizontalShader
         val x = width * pro
         val y = height * offset + bounds.top
@@ -117,7 +116,6 @@ class FlashDrawable: Drawable() {
     }
 
     private fun drawVertical(canvas: Canvas, offset: Float, pro: Float) {
-        verticalShader?:return
         paint.shader = verticalShader
         val x = width * offset + bounds.left
         val y = height * pro
@@ -125,6 +123,14 @@ class FlashDrawable: Drawable() {
         canvas.translate(0F, y)
         canvas.drawLine(x, bounds.top.toFloat(), x, bounds.bottom.toFloat(), paint)
         canvas.restore()
+    }
+
+    private fun bindDefaultColor() {
+        paint.color = if (colors.isEmpty()) {
+            Color.WHITE
+        } else {
+            colors[0]
+        }
     }
 
     override fun onBoundsChange(bounds: Rect?) {
@@ -135,7 +141,8 @@ class FlashDrawable: Drawable() {
     fun notifyDataChange() {
         width = bounds.width().toFloat()
         height = bounds.height().toFloat()
-        if (bounds.isEmpty || colors.isEmpty()) {
+        bindDefaultColor()
+        if (bounds.isEmpty || colors.isEmpty() || colors.size < 2) {
             horizontalShader = null
             verticalShader = null
             return
