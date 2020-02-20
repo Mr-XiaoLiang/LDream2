@@ -77,6 +77,7 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             }
             if (colors.size == 1) {
                 paint.color = colors[0]
+                paint.shader = null
                 canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
                     radius, paint)
                 return
@@ -106,7 +107,6 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         }
 
         private fun resetShader() {
-
             val r = min(bounds.width(), bounds.height()) * 0.5F
             val strokeWidth = r * 0.6F
             paint.strokeWidth = strokeWidth
