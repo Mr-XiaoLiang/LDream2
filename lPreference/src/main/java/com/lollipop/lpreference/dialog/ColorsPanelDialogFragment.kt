@@ -307,7 +307,11 @@ class ColorsPanelDialogFragment: BaseDialog(),
         for (index in selectedData.indices) {
             if (selectedData[index] == color) {
                 log("isItemChecked position=$position, index=$index")
-                return index + 1
+                val result = index + 1
+                if (maxSelected == 1 && result == 1) {
+                    return -1
+                }
+                return result
             }
         }
         return 0
@@ -319,6 +323,9 @@ class ColorsPanelDialogFragment: BaseDialog(),
             return true
         }
         val position = holder.adapterPosition
+        if (position < 0 || position >= shownData.size) {
+            return false
+        }
         val color = shownData[position]
         if (isEditMode) {
             itemAdapter.removeItem(color)
@@ -515,9 +522,11 @@ class ColorsPanelDialogFragment: BaseDialog(),
         protected val colorView: CirclePointView = itemView.findViewById(R.id.colorView)
         protected val borderView: ImageView = itemView.findViewById(R.id.borderView)
 
+        private var isLocked = false
+
         init {
             itemView.setOnClickListener {
-                if (onClick(this)) {
+                if (!isLocked && onClick(this)) {
                     updateCheckedStatus()
                 }
             }
@@ -547,6 +556,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
         protected fun setChecked(isChecked: Boolean, number: String = "", animation: Boolean = true) {
             log("setChecked: isChecked=$isChecked, number=$number, animation=$animation")
             if (animation) {
+                isLocked = true
                 val start = if (isChecked) { 0F } else { 1F }
                 borderView.scaleX = start
                 borderView.scaleY = start
@@ -562,6 +572,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
                             }
                         }
                         onEnd {
+                            isLocked = false
                             if (!isChecked) {
                                 borderView.visibility = View.INVISIBLE
                             }
@@ -574,6 +585,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
                     animator.start()
                 }
             } else {
+                isLocked = false
                 borderView.scaleX = 1F
                 borderView.scaleY = 1F
                 borderView.visibility = if (isChecked) { View.VISIBLE } else { View.INVISIBLE }
