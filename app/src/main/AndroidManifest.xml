@@ -9,13 +9,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.AboutActivity"
+            android:label="@string/title_about"/>
+
         <service
             android:name=".service.LDreamService"
-            android:permission="android.permission.BIND_DREAM_SERVICE"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 

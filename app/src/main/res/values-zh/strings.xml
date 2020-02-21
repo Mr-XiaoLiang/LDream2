@@ -27,4 +27,8 @@
     <string name="summary_background">时间的背景图片</string>
     <string name="title_test_flash">测试闪光</string>
     <string name="summary_test_flash">点击后将会随机添加一种闪光</string>
+    <string name="title_about">关于</string>
+    <string name="summary_about">关于应用或开发者</string>
+    <string name="title_dream_settings">打开屏保设置</string>
+    <string name="summary_dream_settings">前往系统设置，修改屏保应用</string>
 </resources>

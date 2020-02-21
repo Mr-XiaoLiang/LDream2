@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
+import android.provider.Settings
 import com.lollipop.ldream.R
+import com.lollipop.ldream.activity.AboutActivity
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.info.ActionPreferenceInfo
 import com.lollipop.lpreference.util.changeAlpha
@@ -28,6 +30,7 @@ object LDreamPreference {
 
     const val KEY_FLASH_COLOR = "KEY_FLASH_COLOR"
     const val KEY_FLASH_ENABLE = "KEY_FLASH_ENABLE"
+    const val KEY_FLASH_FEATURES = "KEY_FLASH_FEATURES"
 
     const val KEY_TINT_ENABLE = "KEY_TINT_ENABLE"
     const val KEY_TINT_COLOR = "KEY_TINT_COLOR"
@@ -50,6 +53,7 @@ object LDreamPreference {
     private const val ACTION_TEST_FLASH = "ACTION_TEST_FLASH"
 
     private val testFlashFilter: IntentFilter by lazy {
+
         IntentFilter().apply {
             addAction(ACTION_TEST_FLASH)
         }
@@ -154,6 +158,16 @@ object LDreamPreference {
                             iconId = R.drawable.ic_color_lens_black_24dp
                         }
                     )
+                },
+                action(Intent(Settings.ACTION_DREAM_SETTINGS)) {
+                    title = context.getString(R.string.title_dream_settings)
+                    summary = context.getString(R.string.summary_dream_settings)
+                    iconId = R.drawable.ic_settings_system_daydream_black_24dp
+                },
+                action(Intent(context, AboutActivity::class.java)) {
+                    title = context.getString(R.string.title_about)
+                    summary = context.getString(R.string.summary_about)
+                    iconId = R.drawable.ic_info_outline_black_24dp
                 }
             )
         }
@@ -211,4 +225,12 @@ fun Context.timerBackgroundUri(): Uri? {
         return null
     }
     return images[0]
+}
+
+fun Context.isFlashFeatures(): Boolean {
+    return PreferenceHelper.get(this, LDreamPreference.KEY_FLASH_FEATURES, false)
+}
+
+fun Context.openFlashFeatures() {
+    PreferenceHelper.put(this, LDreamPreference.KEY_FLASH_FEATURES, true)
 }

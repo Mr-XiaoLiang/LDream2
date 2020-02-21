@@ -102,7 +102,20 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         flashDrawable.notifyDataChange()
     }
 
+    fun postEgg() {
+        val o = random.nextBoolean()
+        postFlash(FlashDrawable.makeLocation(0F, true, o),
+            FlashDrawable.makeLocation(1F, true, !o),
+            FlashDrawable.makeLocation(0F, false, !o),
+            FlashDrawable.makeLocation(1F, false, o))
+
+    }
+
     fun postDefault(isHorizontal: Boolean = false) {
+        if (bindView?.context?.isFlashFeatures() == true) {
+            postEgg()
+            return
+        }
         val o = random.nextBoolean()
         postFlash(FlashDrawable.makeLocation(0F, !isHorizontal, o),
             FlashDrawable.makeLocation(1F, !isHorizontal, !o))
