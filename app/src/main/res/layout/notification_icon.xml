@@ -7,5 +7,6 @@
     <ImageView
         android:id="@+id/iconView"
         android:layout_width="24dp"
-        android:layout_height="24dp"/>
+        android:layout_height="24dp"
+        android:src="#F00"/>
 </FrameLayout>

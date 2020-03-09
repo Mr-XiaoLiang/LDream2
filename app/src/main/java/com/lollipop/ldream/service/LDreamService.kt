@@ -68,8 +68,6 @@ class LDreamService : DreamService() {
         val notificationGroup = findViewById<FlexboxLayout>(R.id.notificationGroup)
         val powerView = findViewById<TextView>(R.id.powerView)
         val backgroundView = findViewById<ImageView>(R.id.backgroundView)
-        val timerGroup = findViewById<View>(R.id.timerGroup)
-        timerGroup.background = BlackHoleDrawable()
         timerHelper = TimerHelper(timerView, notificationGroup, powerView, backgroundView)
         flashHelper.bindToBackground(findViewById<View>(R.id.flashView))
         timerHelper?.onBatteryChange {

@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         preferenceList.post {
             initPreference()
         }
-        timerGroup.background = BlackHoleDrawable()
 
         flashHelper.bindToBackground(flashView)
         val testFlash = LDreamPreference.registerFlashTest(this) {
