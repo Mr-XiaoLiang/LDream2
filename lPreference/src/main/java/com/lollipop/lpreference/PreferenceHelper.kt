@@ -2,7 +2,7 @@ package com.lollipop.lpreference
 
 import android.content.Context
 import android.text.TextUtils
-import android.util.ArraySet
+import androidx.collection.ArraySet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.lpreference.info.BasePreferenceInfo
@@ -50,7 +50,7 @@ class PreferenceHelper(private val group: RecyclerView) {
                 }
                 is Set<*> -> {
                     if (value.isEmpty()) {
-                        preference.putStringSet(key, ArraySet<String>())
+                        preference.putStringSet(key, ArraySet())
                     } else {
                         val set = ArraySet<String>()
                         for (v in value) {
