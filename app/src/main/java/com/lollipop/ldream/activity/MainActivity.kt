@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.lollipop.ldream.R
-import com.lollipop.ldream.drawer.BlackHoleDrawable
 import com.lollipop.ldream.util.*
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.util.isPortrait

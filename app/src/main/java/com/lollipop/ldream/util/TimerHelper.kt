@@ -22,8 +22,8 @@ import android.widget.TextView
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
-import com.lollipop.ldream.service.NotificationService
 import com.lollipop.ldream.R
+import com.lollipop.ldream.service.NotificationService
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,7 +39,6 @@ class TimerHelper(private val timeView: TextView,
 
     companion object {
         private const val UPDATE_DELAYED = 400L
-        private const val ACTION_BATTERY_CHANGED = Intent.ACTION_BATTERY_CHANGED
         private const val ACTION_NOTIFICATION_POSTED = NotificationService.ACTION_NOTIFICATION_POSTED
         private const val ACTION_NOTIFICATION_REMOVED = NotificationService.ACTION_NOTIFICATION_REMOVED
     }
@@ -51,8 +50,9 @@ class TimerHelper(private val timeView: TextView,
     var isTintIcon = false
     var iconTintColor = Color.WHITE
 
-    var isRunning = false
-        private set
+    private var lastBattery = 0
+
+    private var isRunning = false
 
     val notificationSize: Int
         get() {
@@ -70,7 +70,6 @@ class TimerHelper(private val timeView: TextView,
     private val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
     private val intentFilter: IntentFilter by lazy {
         IntentFilter().apply {
-            addAction(ACTION_BATTERY_CHANGED)
             addAction(ACTION_NOTIFICATION_POSTED)
             addAction(ACTION_NOTIFICATION_REMOVED)
         }
@@ -95,7 +94,7 @@ class TimerHelper(private val timeView: TextView,
     }
 
     private val updateTask = Runnable {
-        updateTimer()
+        notifyUpdateText()
     }
 
     private fun TextView.setTypefaceForName(name: String) {
@@ -151,11 +150,15 @@ class TimerHelper(private val timeView: TextView,
     }
 
     private fun updateBattery() {
-        val value = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        val power = if (value < 0) {
+        val batteryLevel = getBatteryLevel()
+        if (batteryLevel != lastBattery) {
+            onBatteryChangeListener?.invoke()
+            lastBattery = batteryLevel
+        }
+        val power = if (batteryLevel < 0) {
             ""
         } else {
-            "${value.format()}%"
+            "${batteryLevel.format()}%"
         }
         powerView.setValue(power)
     }
@@ -190,7 +193,7 @@ class TimerHelper(private val timeView: TextView,
         updateNotificationIcon()
     }
 
-    fun notifyUpdateAll() {
+    private fun notifyUpdateAll() {
         notifyUpdateText()
         notifyUpdateBackground()
         notifyUpdateIcon()
@@ -201,6 +204,7 @@ class TimerHelper(private val timeView: TextView,
             return
         }
         isRunning = true
+        lastBattery = getBatteryLevel()
         notifyUpdateAll()
         initNotifications()
         context.registerReceiver(this, intentFilter)
@@ -295,10 +299,6 @@ class TimerHelper(private val timeView: TextView,
     override fun onReceive(context: Context?, intent: Intent?) {
         context?:return
         when (intent?.action) {
-            ACTION_BATTERY_CHANGED -> {
-                onBatteryChangeListener?.invoke()
-                updateBattery()
-            }
             ACTION_NOTIFICATION_POSTED -> {
                 val icon = intent.getNotificationIcon()?:return
                 val pkg = intent.getNotificationPkg()?:return
@@ -345,6 +345,10 @@ class TimerHelper(private val timeView: TextView,
             }.loadDrawable(view.context))
         }
 
+    }
+
+    private fun getBatteryLevel(): Int {
+        return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
 }
