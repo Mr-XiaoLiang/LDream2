@@ -1,10 +1,15 @@
 package com.lollipop.ldream.service
 
+import android.os.Build
 import android.os.Handler
 import android.service.dreams.DreamService
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.flexbox.FlexboxLayout
 import com.lollipop.ldream.R
 import com.lollipop.ldream.drawer.BlackHoleDrawable
@@ -41,7 +46,7 @@ class LDreamService : DreamService() {
 
     private val notificationFlashTask: Runnable by lazy {
         Runnable {
-            val size = timerHelper?.notificationSize?:0
+            val size = timerHelper?.notificationSize ?: 0
             if (size > 0) {
                 flashHelper.postRandom(size)
                 postFlashTask()
@@ -55,9 +60,9 @@ class LDreamService : DreamService() {
         isInteractive = false
         // Hide system UI
         isFullscreen = true
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_IMMERSIVE or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        ViewCompat.getWindowInsetsController(window.decorView)?.apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+        }
         // Set the dream layout
         setContentView(R.layout.dream_root)
         initView()
@@ -131,7 +136,7 @@ class LDreamService : DreamService() {
     }
 
     private fun changeLocation() {
-        getTimeBody {  timeBodyView ->
+        getTimeBody { timeBodyView ->
             val rootView = timeBodyView.parent as View
             val x = abs(random.nextInt(rootView.width - timeBodyView.width))
             val y = abs(random.nextInt(rootView.height - timeBodyView.height))
