@@ -8,15 +8,18 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 
 /**
  * Created by lollipop on 2018/1/23.
  * @author Lollipop
  * 饱和度和灰度的选择器
  */
-class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-    ImageView(context, attrs, defStyleAttr) {
+class SatValPaletteView(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
+) : AppCompatImageView(context, attrs, defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)

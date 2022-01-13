@@ -14,8 +14,9 @@ import com.lollipop.lpreference.item.StatusProvider
  * @date 2020-01-18 20:32
  * 偏好设置的适配器
  */
-class PreferenceAdapter(private val data: ArrayList<PreferenceInfo>):
-    RecyclerView.Adapter<PreferenceItem<*>>() {
+class PreferenceAdapter(
+    private val data: ArrayList<PreferenceInfo>
+) : RecyclerView.Adapter<PreferenceItem<*>>() {
 
     var onPreferenceChangeListener: ((BasePreferenceInfo<*>) -> Unit)? = null
 
@@ -49,7 +50,8 @@ class PreferenceAdapter(private val data: ArrayList<PreferenceInfo>):
         if (TextUtils.isEmpty(info.relevantKey)) {
             return info.enable
         }
-        val relevantInfo = PreferenceHelper.findItemByKey(info.relevantKey, data) ?: return info.enable
+        val relevantInfo =
+            PreferenceHelper.findItemByKey(info.relevantKey, data) ?: return info.enable
         return if (relevantInfo is StatusProvider) {
             relevantInfo.statusValue == info.relevantEnable
         } else {

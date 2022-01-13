@@ -2,6 +2,7 @@ package com.lollipop.lpreference.item
 
 import android.view.View
 import android.view.ViewGroup
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.dialog.ColorsPanelDialogFragment
 import com.lollipop.lpreference.info.ColorsPreferenceInfo
@@ -15,9 +16,7 @@ import com.lollipop.lpreference.view.ColorWheelView
 class ColorsPreference(group: ViewGroup): BasePreferenceItem<ColorsPreferenceInfo>(group) {
     override val widgetId: Int = R.layout.preference_plugin_colors
 
-    private val colorsView: ColorWheelView by lazy {
-        itemView.findViewById<ColorWheelView>(R.id.colorsView)
-    }
+    private val colorsView: ColorWheelView? by findInSelf()
 
     override fun onItemClick(view: View) {
         super.onItemClick(view)
@@ -35,13 +34,15 @@ class ColorsPreference(group: ViewGroup): BasePreferenceItem<ColorsPreferenceInf
         if (preferenceInfo?.maxSize?:1 == 1) {
             return false
         }
-        colorsView.isGradient = !colorsView.isGradient
+        colorsView?.apply {
+            isGradient = !isGradient
+        }
         return true
     }
 
     override fun onBind(info: ColorsPreferenceInfo) {
         super.onBind(info)
-        colorsView.setColor(info.getValue(context))
+        colorsView?.setColor(info.getValue(context))
     }
 
 }

@@ -1,18 +1,15 @@
 package com.lollipop.ldream.service
 
-import android.os.Build
 import android.os.Handler
 import android.service.dreams.DreamService
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.flexbox.FlexboxLayout
+import com.lollipop.base.findInSelf
 import com.lollipop.ldream.R
-import com.lollipop.ldream.drawer.BlackHoleDrawable
 import com.lollipop.ldream.util.FlashHelper
 import com.lollipop.ldream.util.TimerHelper
 import com.lollipop.lpreference.util.isPortrait
@@ -54,27 +51,29 @@ class LDreamService : DreamService() {
         }
     }
 
+    private val timerView: TextView? by findInSelf()
+    private val notificationGroup: FlexboxLayout? by findInSelf()
+    private val powerView: TextView? by findInSelf()
+    private val backgroundView: ImageView? by findInSelf()
+    private val flashView: View? by findInSelf()
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        // Exit dream upon user touch
-        isInteractive = false
-        // Hide system UI
-        isFullscreen = true
-        ViewCompat.getWindowInsetsController(window.decorView)?.apply {
-            hide(WindowInsetsCompat.Type.systemBars())
-        }
+        setFullscreen()
         // Set the dream layout
         setContentView(R.layout.dream_root)
         initView()
     }
 
     private fun initView() {
-        val timerView = findViewById<TextView>(R.id.timerView)
-        val notificationGroup = findViewById<FlexboxLayout>(R.id.notificationGroup)
-        val powerView = findViewById<TextView>(R.id.powerView)
-        val backgroundView = findViewById<ImageView>(R.id.backgroundView)
-        timerHelper = TimerHelper(timerView, notificationGroup, powerView, backgroundView)
-        flashHelper.bindToBackground(findViewById<View>(R.id.flashView))
+        timerHelper = TimerHelper(
+            this,
+            { timerView },
+            { notificationGroup },
+            { powerView },
+            { backgroundView }
+        )
+        flashHelper.bindToBackground(flashView)
         timerHelper?.onBatteryChange {
             flashHelper.postDefault(isPortrait())
         }
@@ -87,6 +86,7 @@ class LDreamService : DreamService() {
     override fun onDreamingStarted() {
         super.onDreamingStarted()
         timerHelper?.onStart()
+        setFullscreen()
         getTimeBody { view ->
             view.alpha = 0F
             view.visibility = View.INVISIBLE
@@ -97,6 +97,16 @@ class LDreamService : DreamService() {
         }
         postMoveTask()
         postFlashTask()
+    }
+
+    private fun setFullscreen() {
+        // Exit dream upon user touch
+        isInteractive = false
+        // Hide system UI
+        isFullscreen = true
+        ViewCompat.getWindowInsetsController(window.decorView)?.apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+        }
     }
 
     private fun doHideAnimation() {

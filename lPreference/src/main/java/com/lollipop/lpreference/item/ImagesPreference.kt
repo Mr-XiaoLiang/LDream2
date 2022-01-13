@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.dialog.ImagesPanelDialogFragment
 import com.lollipop.lpreference.info.ImagesPreferenceInfo
@@ -18,9 +19,7 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
 
     private var selectedIndex = 0
 
-    private val imageView: ImageView by lazy {
-        itemView.findViewById<ImageView>(R.id.imageView)
-    }
+    private val imageView: ImageView? by findInSelf()
 
     override fun onItemClick(view: View) {
         super.onItemClick(view)
@@ -40,7 +39,9 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
             if (values.size > 1) {
                 selectedIndex++
                 selectedIndex %= values.size
-                Glide.with(imageView).load(values[selectedIndex]).into(imageView)
+                imageView?.let {
+                    Glide.with(it).load(values[selectedIndex]).into(it)
+                }
                 return true
             }
         }
@@ -51,10 +52,12 @@ class ImagesPreference(group: ViewGroup): BasePreferenceItem<ImagesPreferenceInf
         super.onBind(info)
         selectedIndex = 0
         val values = info.getValue(context)
-        if (values.size > 0) {
-            Glide.with(imageView).load(values[selectedIndex]).into(imageView)
-        } else {
-            imageView.setImageDrawable(null)
+        imageView?.let {
+            if (values.size > 0) {
+                Glide.with(it).load(values[selectedIndex]).into(it)
+            } else {
+                it.setImageDrawable(null)
+            }
         }
     }
 

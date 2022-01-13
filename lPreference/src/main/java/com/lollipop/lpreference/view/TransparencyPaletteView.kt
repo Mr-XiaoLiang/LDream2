@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import kotlin.math.max
 import kotlin.math.min
 
@@ -15,8 +15,11 @@ import kotlin.math.min
  * @author Lollipop
  * @date 2019/09/05
  */
-class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-    ImageView(context, attrs, defStyleAttr) {
+class TransparencyPaletteView(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
+) : AppCompatImageView(context, attrs, defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)
@@ -30,8 +33,8 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event?:return super.onTouchEvent(event)
-        return when(event.action){
+        event ?: return super.onTouchEvent(event)
+        return when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     if (parent is ViewGroup) {
@@ -54,11 +57,11 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
     }
 
 
-    interface TransparencyCallback{
+    interface TransparencyCallback {
         fun onTransparencySelect(alphaF: Float, alphaI: Int)
     }
 
-    private class TransparencyPaletteDrawable: Drawable() {
+    private class TransparencyPaletteDrawable : Drawable() {
 
         companion object {
             private const val spanY = 4
@@ -96,8 +99,10 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
             }
 
             paint.shader = alphaShader
-            canvas.drawRect(bounds.left.toFloat(), bounds.top.toFloat(),
-                bounds.right.toFloat(), bounds.bottom.toFloat(), paint)
+            canvas.drawRect(
+                bounds.left.toFloat(), bounds.top.toFloat(),
+                bounds.right.toFloat(), bounds.bottom.toFloat(), paint
+            )
 
             paint.shader = null
             paint.color = Color.WHITE
@@ -129,10 +134,12 @@ class TransparencyPaletteView(context: Context, attrs: AttributeSet?, defStyleAt
 
         override fun onBoundsChange(bounds: Rect?) {
             super.onBoundsChange(bounds)
-            bounds?:return
-            alphaShader = LinearGradient(bounds.left.toFloat(), bounds.top.toFloat(),
+            bounds ?: return
+            alphaShader = LinearGradient(
+                bounds.left.toFloat(), bounds.top.toFloat(),
                 bounds.right.toFloat(), bounds.top.toFloat(),
-                Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP)
+                Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP
+            )
 
             arrowPath.reset()
             val height = bounds.height() * 1F

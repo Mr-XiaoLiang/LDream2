@@ -5,7 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import com.lollipop.lpreference.util.log
 import kotlin.math.min
 
@@ -15,7 +15,7 @@ import kotlin.math.min
  * @author Lollipop
  */
 class CirclePointView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
-    : TextView(context,attrs,defStyleAttr) {
+    : AppCompatTextView(context,attrs,defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
     constructor(context: Context):this(context,null)

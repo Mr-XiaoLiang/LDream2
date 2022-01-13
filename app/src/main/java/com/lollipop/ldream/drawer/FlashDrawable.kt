@@ -10,7 +10,7 @@ import kotlin.math.roundToInt
  * @date 2020-02-17 21:46
  * 闪光用的Drawable
  */
-class FlashDrawable: Drawable() {
+class FlashDrawable : Drawable() {
 
     companion object {
 
@@ -148,12 +148,16 @@ class FlashDrawable: Drawable() {
             return
         }
         val colorArray = IntArray(colors.size) { colors[it] }
-        horizontalShader = LinearGradient(bounds.left.toFloat(),
+        horizontalShader = LinearGradient(
+            bounds.left.toFloat(),
             bounds.top.toFloat(), bounds.right.toFloat(), bounds.top.toFloat(),
-            colorArray, null, Shader.TileMode.CLAMP)
-        verticalShader = LinearGradient(bounds.left.toFloat(),
+            colorArray, null, Shader.TileMode.CLAMP
+        )
+        verticalShader = LinearGradient(
+            bounds.left.toFloat(),
             bounds.top.toFloat(), bounds.left.toFloat(), bounds.bottom.toFloat(),
-            colorArray, null, Shader.TileMode.CLAMP)
+            colorArray, null, Shader.TileMode.CLAMP
+        )
     }
 
     override fun setAlpha(alpha: Int) {

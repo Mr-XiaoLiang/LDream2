@@ -7,20 +7,23 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 
 /**
  * 色相显示的View
  * @author Lollipop
  * @date 2019/09/05
  */
-class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
-    ImageView(context, attrs, defStyleAttr) {
+class HuePaletteView(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
+) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
-    constructor(context: Context):this(context,null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context) : this(context, null)
 
-    var hueCallback:HueCallback? = null
+    var hueCallback: HueCallback? = null
     private val hueDrawable = HuePaletteDrawable()
 
     init {
@@ -29,10 +32,10 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event?:return super.onTouchEvent(event)
-        return when(event.action){
+        event ?: return super.onTouchEvent(event)
+        return when (event.action) {
 
-            MotionEvent.ACTION_DOWN,MotionEvent.ACTION_MOVE,MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     if (parent is ViewGroup) {
                         parent.requestDisallowInterceptTouchEvent(true)
@@ -48,16 +51,16 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         }
     }
 
-    fun parser(hue: Float){
+    fun parser(hue: Float) {
         hueDrawable.parser(hue)
         hueCallback?.onHueSelect(hue.toInt())
     }
 
-    interface HueCallback{
-        fun onHueSelect(hue:Int)
+    interface HueCallback {
+        fun onHueSelect(hue: Int)
     }
 
-    class HuePaletteDrawable: Drawable() {
+    class HuePaletteDrawable : Drawable() {
 
         private val paint = Paint().apply {
             isDither = true
@@ -75,16 +78,18 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         private val arrowPath = Path()
 
         init {
-            for((count, i) in ((hueColor.size-1) downTo 0).withIndex()){
+            for ((count, i) in ((hueColor.size - 1) downTo 0).withIndex()) {
                 hueColor[count] = Color.HSVToColor(floatArrayOf(i.toFloat(), 1f, 1f))
             }
         }
 
         override fun draw(canvas: Canvas) {
-            canvas.drawRect(bounds,paint)
+            canvas.drawRect(bounds, paint)
             val selectY = getSelectY()
-            canvas.drawLine(bounds.left.toFloat(),selectY,
-                bounds.right.toFloat(),selectY,linePaint)
+            canvas.drawLine(
+                bounds.left.toFloat(), selectY,
+                bounds.right.toFloat(), selectY, linePaint
+            )
             canvas.save()
             canvas.translate(0F, selectY)
             canvas.drawPath(arrowPath, linePaint)
@@ -93,12 +98,13 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
 
         override fun onBoundsChange(bounds: Rect?) {
             super.onBoundsChange(bounds)
-            bounds?:return
+            bounds ?: return
 
             val hueShader = LinearGradient(
-                bounds.left.toFloat(),bounds.top.toFloat(),
-                bounds.left.toFloat(),bounds.bottom.toFloat(),
-                hueColor,null,Shader.TileMode.CLAMP)
+                bounds.left.toFloat(), bounds.top.toFloat(),
+                bounds.left.toFloat(), bounds.bottom.toFloat(),
+                hueColor, null, Shader.TileMode.CLAMP
+            )
 
             paint.shader = hueShader
 
@@ -118,15 +124,15 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             invalidateSelf()
         }
 
-        fun selectTo(y:Float):Int{
+        fun selectTo(y: Float): Int {
             //计算高度对应的色相值序号
             val values = y / bounds.height() * 361 + 0.5
             //得到色相值
-            selectHue = hueColor.size-values.toInt()
-            if(selectHue<0){
+            selectHue = hueColor.size - values.toInt()
+            if (selectHue < 0) {
                 selectHue = 0
             }
-            if(selectHue > 360){
+            if (selectHue > 360) {
                 selectHue = 360
             }
             //发起重绘
@@ -134,13 +140,13 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             return selectHue
         }
 
-        fun parser(hue:Float){
+        fun parser(hue: Float) {
             this.selectHue = (hue + 0.5F).toInt()
             invalidateSelf()
         }
 
-        private fun getSelectY():Float{
-            return (1 - 1.0F * selectHue / hueColor.size)  * bounds.height()
+        private fun getSelectY(): Float {
+            return (1 - 1.0F * selectHue / hueColor.size) * bounds.height()
         }
 
         override fun setAlpha(alpha: Int) {

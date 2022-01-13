@@ -11,9 +11,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
@@ -22,20 +27,23 @@ import com.lollipop.lpreference.view.CirclePointView
 import com.lollipop.lpreference.view.HuePaletteView
 import com.lollipop.lpreference.view.SatValPaletteView
 import com.lollipop.lpreference.view.TransparencyPaletteView
-import kotlinx.android.synthetic.main.fragment_colors_panel_dialog.*
-import kotlinx.android.synthetic.main.fragment_palette.*
 
 /**
  * 颜色选择的面板
  * @author Lollipop
  */
-class ColorsPanelDialogFragment: BaseDialog(),
+class ColorsPanelDialogFragment : BaseDialog(),
     HuePaletteView.HueCallback, SatValPaletteView.HSVCallback,
     TransparencyPaletteView.TransparencyCallback,
     View.OnClickListener {
 
     companion object {
-        fun show(context: Context, selectedColor: ColorArray, max: Int = -1, callback: (IntArray) -> Unit) {
+        fun show(
+            context: Context,
+            selectedColor: ColorArray,
+            max: Int = -1,
+            callback: (IntArray) -> Unit
+        ) {
             ColorsPanelDialogFragment().apply {
                 selectedData.clear()
                 for (color in selectedColor) {
@@ -80,26 +88,46 @@ class ColorsPanelDialogFragment: BaseDialog(),
         }, shownActions)
     }
 
+    private val huePalette: HuePaletteView? by findInSelf()
+    private val satValPalette: SatValPaletteView? by findInSelf()
+    private val transparencyPalette: TransparencyPaletteView? by findInSelf()
+    private val definiteBtn: FloatingActionButton? by findInSelf()
+    private val backBtn: ImageView? by findInSelf()
+    private val colorPoolView: RecyclerView? by findInSelf()
+    private val poolPanel: FrameLayout? by findInSelf()
+    private val previewColorView: CirclePointView? by findInSelf()
+    private val colorValueView: CirclePointView? by findInSelf()
+    private val palettePanel: ConstraintLayout? by findInSelf()
+    private val selectedSizeView: TextView? by findInSelf()
+    private val modeStatusView: ImageView? by findInSelf()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        huePalette.hueCallback = this
-        satValPalette.hsvCallback = this
-        transparencyPalette.transparencyCallback = this
-        definiteBtn.setOnClickListener(this)
-        if (backBtn.isPortrait()) {
-            backBtn.setOnClickListener(this)
-        } else {
-            backBtn.visibility = View.GONE
+        huePalette?.hueCallback = this
+        satValPalette?.hsvCallback = this
+        transparencyPalette?.transparencyCallback = this
+        definiteBtn?.setOnClickListener(this)
+        backBtn?.let { back ->
+            if (back.isPortrait()) {
+                back.setOnClickListener(this)
+            } else {
+                back.visibility = View.GONE
+            }
         }
 
-        colorPoolView.layoutManager = GridLayoutManager(colorPoolView.context,
-            spanCount, RecyclerView.VERTICAL, false).apply {
+        colorPoolView?.let { poolView ->
+            poolView.layoutManager = GridLayoutManager(
+                poolView.context,
+                spanCount,
+                RecyclerView.VERTICAL,
+                false
+            )
+            poolView.adapter = itemAdapter
         }
-        colorPoolView.adapter = itemAdapter
-        if (poolPanel.isPortrait()) {
-            poolPanel.post {
-                colorPoolView.layoutParams = colorPoolView.layoutParams.apply {
-                    width = poolPanel.width
+        if (poolPanel?.isPortrait() == true) {
+            poolPanel?.post {
+                colorPoolView?.layoutParams = colorPoolView?.layoutParams?.apply {
+                    width = poolPanel?.width ?: width
                 }
             }
         }
@@ -124,7 +152,13 @@ class ColorsPanelDialogFragment: BaseDialog(),
                 shownData.add(color)
             }
         }
-        initPalette(if (shownData.isEmpty()) { Color.RED } else { shownData[shownData.size - 1] } )
+        initPalette(
+            if (shownData.isEmpty()) {
+                Color.RED
+            } else {
+                shownData[shownData.size - 1]
+            }
+        )
         onModeChange()
         updateSelectedItem()
     }
@@ -182,13 +216,13 @@ class ColorsPanelDialogFragment: BaseDialog(),
 
     private fun initPalette(color: Int) {
         Color.colorToHSV(color, hsvTemp)
-        huePalette.parser(hsvTemp[0])
-        satValPalette.parser(hsvTemp[1], hsvTemp[2])
-        transparencyPalette.parser(Color.alpha(color))
+        huePalette?.parser(hsvTemp[0])
+        satValPalette?.parser(hsvTemp[1], hsvTemp[2])
+        transparencyPalette?.parser(Color.alpha(color))
     }
 
     override fun onHueSelect(hue: Int) {
-        satValPalette.onHueChange(hue.toFloat())
+        satValPalette?.onHueChange(hue.toFloat())
     }
 
     override fun onHSVSelect(hsv: FloatArray, rgb: Int) {
@@ -208,73 +242,81 @@ class ColorsPanelDialogFragment: BaseDialog(),
 
     private fun onColorChange() {
         val color = merge()
-        previewColorView.setStatusColor(color)
-        colorValueView.text = color.colorValue()
+        previewColorView?.setStatusColor(color)
+        colorValueView?.text = color.colorValue()
     }
 
     private fun openPalette() {
-        if (!palettePanel.isPortrait()) {
-            return
-        }
-        if (palettePanel.translationX < 1) {
-            palettePanel.translationX = palettePanel.width * 1F
-        }
-        palettePanel.animate().let { animator ->
-            animator.cancel()
-            changeInterpolator(animator)
-            animator.translationX(0F)
-
-            animator.lifecycleBinding {
-                onStart {
-                    palettePanel.visibility = View.VISIBLE
-                    removeThis(it)
-                }
+        palettePanel?.apply {
+            if (!isPortrait()) {
+                return
             }
-            animator.start()
+            if (translationX < 1) {
+                translationX = width * 1F
+            }
+            animate().let { animator ->
+                animator.cancel()
+                changeInterpolator(animator)
+                animator.translationX(0F)
+
+                animator.lifecycleBinding {
+                    onStart {
+                        visibility = View.VISIBLE
+                        removeThis(it)
+                    }
+                }
+                animator.start()
+            }
         }
 
-        poolPanel.animate().let { animator ->
-            animator.cancel()
-            changeInterpolator(animator)
-            animator.translationX(poolPanel.width * -1F)
-            animator.lifecycleBinding {
-                onStart {
-                    poolPanel.visibility = View.INVISIBLE
-                    removeThis(it)
+        poolPanel?.apply {
+            animate().let { animator ->
+                animator.cancel()
+                changeInterpolator(animator)
+                animator.translationX(width * -1F)
+                animator.lifecycleBinding {
+                    onStart {
+                        visibility = View.INVISIBLE
+                        removeThis(it)
+                    }
                 }
+                animator.start()
             }
-            animator.start()
         }
     }
 
     private fun closePalette() {
-        if (!palettePanel.isPortrait()) {
-            return
-        }
-        palettePanel.animate().let { animator ->
-            animator.cancel()
-            changeInterpolator(animator)
-            animator.translationX(palettePanel.width * 1F)
-            animator.lifecycleBinding {
-                onEnd {
-                    palettePanel.visibility = View.INVISIBLE
-                    removeThis(it)
-                }
+        palettePanel?.apply {
+            if (!isPortrait()) {
+                return
             }
-            animator.start()
+            animate().let { animator ->
+                animator.cancel()
+                changeInterpolator(animator)
+                animator.translationX(width * 1F)
+                animator.lifecycleBinding {
+                    onEnd {
+                        visibility = View.INVISIBLE
+                        removeThis(it)
+                    }
+                }
+                animator.start()
+            }
         }
 
-        poolPanel.animate().let { animator ->
-            animator.cancel()
-            changeInterpolator(animator)
-            animator.translationX(0F)
-            animator.lifecycleBinding {
-                onStart {
-                    poolPanel.visibility = View.VISIBLE
-                    removeThis(it)
+        poolPanel?.apply {
+            animate().let { animator ->
+                animator.cancel()
+                changeInterpolator(animator)
+                animator.translationX(0F)
+                animator.lifecycleBinding {
+                    onStart {
+                        visibility = View.VISIBLE
+                        removeThis(it)
+                    }
                 }
+                animator.start()
             }
-            animator.start()
         }
     }
 
@@ -340,7 +382,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
                 return true
             }
         }
-        if (maxSelected  == 1) {
+        if (maxSelected == 1) {
             while (selectedData.size > 0) {
                 val old = shownData.indexOf(selectedData.removeAt(0))
                 itemAdapter.notifyItemChanged(old)
@@ -360,7 +402,7 @@ class ColorsPanelDialogFragment: BaseDialog(),
     @SuppressLint("SetTextI18n")
     private fun updateSelectedItem(start: Int = -1) {
         if (maxSelected > 0) {
-            selectedSizeView.text = "${selectedData.size}/$maxSelected"
+            selectedSizeView?.text = "${selectedData.size}/$maxSelected"
         }
         if (start < 0 || start >= selectedData.size) {
             return
@@ -390,17 +432,18 @@ class ColorsPanelDialogFragment: BaseDialog(),
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun onModeChange() {
         shownActions.clear()
         if (isEditMode) {
             shownActions.add(ACTION_PALETTE)
-            modeStatusView.setImageResource(ACTION_DELETE)
+            modeStatusView?.setImageResource(ACTION_DELETE)
         } else {
             shownActions.add(ACTION_DELETE)
-            if (modeStatusView.isPortrait()) {
+            if (modeStatusView?.isPortrait() == true) {
                 shownActions.add(ACTION_ADD)
             }
-            modeStatusView.setImageResource(ACTION_PALETTE)
+            modeStatusView?.setImageResource(ACTION_PALETTE)
         }
         // 添加空内容
         for (i in 0 until spanCount) {
@@ -409,10 +452,12 @@ class ColorsPanelDialogFragment: BaseDialog(),
         itemAdapter.notifyDataSetChanged()
     }
 
-    private class ItemAdapter(private val data: ArrayList<Int>,
-                              private val isChecked: (Int) -> Int,
-                              private val onClick: (RecyclerView.ViewHolder) -> Boolean,
-                              private val actionList: ArrayList<Int>):
+    private class ItemAdapter(
+        private val data: ArrayList<Int>,
+        private val isChecked: (Int) -> Int,
+        private val onClick: (RecyclerView.ViewHolder) -> Boolean,
+        private val actionList: ArrayList<Int>
+    ) :
         RecyclerView.Adapter<ItemHolder>() {
 
         companion object {
@@ -500,21 +545,26 @@ class ColorsPanelDialogFragment: BaseDialog(),
 
     }
 
-    private open class ItemHolder (view: View,
-                            protected val isChecked: (Int) -> Int,
-                            protected val onClick: (RecyclerView.ViewHolder) -> Boolean):
+    private open class ItemHolder(
+        view: View,
+        protected val isChecked: (Int) -> Int,
+        protected val onClick: (RecyclerView.ViewHolder) -> Boolean
+    ) :
         RecyclerView.ViewHolder(view) {
 
         companion object {
 
             fun createView(viewGroup: ViewGroup): View {
                 return LayoutInflater.from(viewGroup.context).inflate(
-                    R.layout.item_color_panel, viewGroup, false)
+                    R.layout.item_color_panel, viewGroup, false
+                )
             }
 
-            fun create(viewGroup: ViewGroup,
-                       isChecked: (Int) -> Int,
-                       onClick: (RecyclerView.ViewHolder) -> Boolean): ItemHolder {
+            fun create(
+                viewGroup: ViewGroup,
+                isChecked: (Int) -> Int,
+                onClick: (RecyclerView.ViewHolder) -> Boolean
+            ): ItemHolder {
                 return ItemHolder(createView(viewGroup), isChecked, onClick)
             }
         }
@@ -545,7 +595,11 @@ class ColorsPanelDialogFragment: BaseDialog(),
         private fun updateCheckedStatus(isAnim: Boolean = true) {
             val status = isChecked(this.adapterPosition)
             val checked = status != 0
-            val value = if (status > 0) { status.toString() } else { "" }
+            val value = if (status > 0) {
+                status.toString()
+            } else {
+                ""
+            }
             setChecked(checked, value, isAnim)
         }
 
@@ -553,14 +607,26 @@ class ColorsPanelDialogFragment: BaseDialog(),
             colorView.setStatusColor(color)
         }
 
-        protected fun setChecked(isChecked: Boolean, number: String = "", animation: Boolean = true) {
+        protected fun setChecked(
+            isChecked: Boolean,
+            number: String = "",
+            animation: Boolean = true
+        ) {
             log("setChecked: isChecked=$isChecked, number=$number, animation=$animation")
             if (animation) {
                 isLocked = true
-                val start = if (isChecked) { 0F } else { 1F }
+                val start = if (isChecked) {
+                    0F
+                } else {
+                    1F
+                }
                 borderView.scaleX = start
                 borderView.scaleY = start
-                val end = if (isChecked) { 1F } else {0F }
+                val end = if (isChecked) {
+                    1F
+                } else {
+                    0F
+                }
                 borderView.animate().let { animator ->
                     animator.cancel()
                     animator.scaleX(end).scaleY(end)
@@ -588,20 +654,32 @@ class ColorsPanelDialogFragment: BaseDialog(),
                 isLocked = false
                 borderView.scaleX = 1F
                 borderView.scaleY = 1F
-                borderView.visibility = if (isChecked) { View.VISIBLE } else { View.INVISIBLE }
+                borderView.visibility = if (isChecked) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
             }
-            colorView.autoText = (if (isChecked) { number } else { "" })
+            colorView.autoText = (if (isChecked) {
+                number
+            } else {
+                ""
+            })
         }
 
     }
 
-    private class ActionHolder private constructor(view: View,
-                                                  onClick: (RecyclerView.ViewHolder) -> Boolean):
+    private class ActionHolder private constructor(
+        view: View,
+        onClick: (RecyclerView.ViewHolder) -> Boolean
+    ) :
         ItemHolder(view, { 0 }, onClick) {
 
         companion object {
-            fun create(viewGroup: ViewGroup,
-                       onClick: (RecyclerView.ViewHolder) -> Boolean): ActionHolder {
+            fun create(
+                viewGroup: ViewGroup,
+                onClick: (RecyclerView.ViewHolder) -> Boolean
+            ): ActionHolder {
                 return ActionHolder(createView(viewGroup), onClick)
             }
         }

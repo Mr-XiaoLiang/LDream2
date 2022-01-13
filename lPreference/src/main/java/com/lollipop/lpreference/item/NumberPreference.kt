@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.info.NumberPreferenceInfo
@@ -22,9 +23,7 @@ class NumberPreference(viewGroup: ViewGroup): BasePreferenceItem<NumberPreferenc
 
     private var number = 0
 
-    private val numberView: TextView by lazy {
-        itemView.findViewById<TextView>(R.id.numberView)
-    }
+    private val numberView: TextView? by findInSelf()
 
     private val alternative: ArrayList<NumberInfo> by lazy {
         ArrayList<NumberInfo>(10).apply {
@@ -47,12 +46,12 @@ class NumberPreference(viewGroup: ViewGroup): BasePreferenceItem<NumberPreferenc
     override fun onBind(info: NumberPreferenceInfo) {
         super.onBind(info)
         number = info.getValue(context)
-        numberView.text = number.range(0, 9).toString()
+        numberView?.text = number.range(0, 9).toString()
     }
 
     override fun onStatusChange(isEnable: Boolean) {
         super.onStatusChange(isEnable)
-        numberView.setStatus(isEnable)
+        numberView?.setStatus(isEnable)
     }
 
     private class NumberInfo(name: String, val value: Int): CardWheelDialogFragment.CardInfo(name)

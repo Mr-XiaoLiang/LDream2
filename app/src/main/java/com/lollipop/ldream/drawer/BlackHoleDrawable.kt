@@ -2,7 +2,6 @@ package com.lollipop.ldream.drawer
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import com.lollipop.lpreference.util.alpha
 import com.lollipop.lpreference.util.changeAlpha
 import kotlin.math.min
 

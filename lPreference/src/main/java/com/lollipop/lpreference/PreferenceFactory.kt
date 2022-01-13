@@ -11,8 +11,8 @@ import com.lollipop.lpreference.item.*
  */
 object PreferenceFactory {
 
-    private const val Group  = -1
-    private const val Empty  = 0
+    private const val Group = -1
+    private const val Empty = 0
     private const val Number = 1
     private const val Action = 2
     private const val Switch = 3
@@ -32,7 +32,7 @@ object PreferenceFactory {
     }
 
     fun createItem(group: ViewGroup, type: Int): PreferenceItem<*> {
-        return when(type) {
+        return when (type) {
             Number -> NumberPreference(group)
             Action -> ActionPreference(group)
             Switch -> SwitchPreference(group)

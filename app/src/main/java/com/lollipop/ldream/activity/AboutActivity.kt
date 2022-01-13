@@ -3,10 +3,10 @@ package com.lollipop.ldream.activity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.lollipop.ldream.R
+import com.lollipop.ldream.databinding.ActivityAboutBinding
 import com.lollipop.ldream.util.FlashHelper
+import com.lollipop.ldream.util.lazyBind
 import com.lollipop.ldream.util.openFlashFeatures
-import kotlinx.android.synthetic.main.activity_about.*
 import java.util.*
 
 /**
@@ -15,12 +15,14 @@ import java.util.*
  */
 class AboutActivity : AppCompatActivity() {
 
+    private val binding: ActivityAboutBinding by lazyBind()
+
     private var tapCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initView()
     }
@@ -34,11 +36,11 @@ class AboutActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        versionView.text = packageManager.getPackageInfo(packageName, 0).versionName
+        binding.versionView.text = packageManager.getPackageInfo(packageName, 0).versionName
         val flashHelper = FlashHelper()
-        flashHelper.bindToBackground(rootGroup)
+        flashHelper.bindToBackground(binding.rootGroup)
         val random = Random()
-        logoView.setOnClickListener {
+        binding.logoView.setOnClickListener {
             tapCount++
             if (tapCount == 7) {
                 openFlashFeatures()

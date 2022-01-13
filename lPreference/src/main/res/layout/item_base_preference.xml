@@ -1,56 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
     android:paddingLeft="10dp"
-    android:paddingRight="10dp"
     android:paddingTop="14dp"
-    android:paddingBottom="14dp"
-    android:background="?attr/selectableItemBackground">
+    android:paddingRight="10dp"
+    android:paddingBottom="14dp">
 
     <FrameLayout
         android:id="@+id/previewBody"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/iconView"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:scaleType="fitXY"
         android:padding="4dp"
+        android:scaleType="fitXY"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/summaryView"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@id/titleView"
-        app:layout_constraintBottom_toBottomOf="@id/summaryView"/>
+        app:layout_constraintTop_toTopOf="@id/titleView" />
 
     <TextView
-        android:layout_width="0px"
-        android:layout_height="wrap_content"
         android:id="@+id/titleView"
-        android:textSize="@dimen/preference_title"
-        android:layout_marginEnd="10dp"
-        app:layout_goneMarginEnd="0dp"
-        android:layout_marginStart="10dp"
-        app:layout_goneMarginStart="0dp"
-        app:layout_constraintLeft_toRightOf="@id/iconView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/previewBody"/>
-
-    <TextView
         android:layout_width="0px"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="@dimen/preference_title"
+        app:layout_constraintLeft_toRightOf="@id/iconView"
+        app:layout_constraintRight_toLeftOf="@id/previewBody"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="0dp"
+        app:layout_goneMarginStart="0dp" />
+
+    <TextView
         android:id="@+id/summaryView"
-        android:textSize="@dimen/preference_summary"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:textSize="@dimen/preference_summary"
         app:layout_constraintLeft_toLeftOf="@id/titleView"
-        app:layout_constraintTop_toBottomOf="@id/titleView"
-        app:layout_constraintRight_toRightOf="@id/titleView"/>
+        app:layout_constraintRight_toRightOf="@id/titleView"
+        app:layout_constraintTop_toBottomOf="@id/titleView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

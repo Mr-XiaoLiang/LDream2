@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.info.SwitchPreferenceInfo
 
@@ -17,9 +18,7 @@ class SwitchPreference(group: ViewGroup): BasePreferenceItem<SwitchPreferenceInf
 
     override val widgetId: Int = R.layout.preference_plugin_switch
 
-    private val switchView: SwitchMaterial by lazy {
-        itemView.findViewById<SwitchMaterial>(R.id.switchView)
-    }
+    private val switchView: SwitchMaterial? by findInSelf()
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
         preferenceInfo?.putValue(context, isChecked)
@@ -37,13 +36,13 @@ class SwitchPreference(group: ViewGroup): BasePreferenceItem<SwitchPreferenceInf
 
     override fun onStatusChange(isEnable: Boolean) {
         super.onStatusChange(isEnable)
-        switchView.isEnabled = isEnable
+        switchView?.isEnabled = isEnable
     }
 
     private fun changeSwitch(isChecked: Boolean) {
-        switchView.setOnCheckedChangeListener(null)
-        switchView.isChecked = isChecked
-        switchView.setOnCheckedChangeListener(this)
+        switchView?.setOnCheckedChangeListener(null)
+        switchView?.isChecked = isChecked
+        switchView?.setOnCheckedChangeListener(this)
     }
 
 }

@@ -46,8 +46,8 @@ object LDreamPreference {
     const val DEF_TINT_ENABLE = true
 
     val DEF_TINT_COLOR = DEF_SECONDARY_COLOR
-    
-    private const val ACTION_NOTIFICATION_LISTENER_SETTINGS = 
+
+    private const val ACTION_NOTIFICATION_LISTENER_SETTINGS =
         "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"
 
     private const val ACTION_TEST_FLASH = "ACTION_TEST_FLASH"
@@ -192,23 +192,31 @@ fun Context.timerSecondaryColor(): Int {
 }
 
 fun Context.timerKeyWord(): String {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_KEYWORD,
-        LDreamPreference.DEF_KEYWORD).toString()
+    return PreferenceHelper.get(
+        this, LDreamPreference.KEY_KEYWORD,
+        LDreamPreference.DEF_KEYWORD
+    ).toString()
 }
 
 fun Context.timerFlashColor(value: ColorArray? = null): ColorArray {
-    return PreferenceHelper.getColor(this, LDreamPreference.KEY_FLASH_COLOR,
-        value?:LDreamPreference.DEF_FLASH_COLOR.newInstance())
+    return PreferenceHelper.getColor(
+        this, LDreamPreference.KEY_FLASH_COLOR,
+        value ?: LDreamPreference.DEF_FLASH_COLOR.newInstance()
+    )
 }
 
 fun Context.timerFlashEnable(): Boolean {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_FLASH_ENABLE,
-        LDreamPreference.DEF_FLASH_ENABLER)
+    return PreferenceHelper.get(
+        this, LDreamPreference.KEY_FLASH_ENABLE,
+        LDreamPreference.DEF_FLASH_ENABLER
+    )
 }
 
 fun Context.timerTintEnable(): Boolean {
-    return PreferenceHelper.get(this, LDreamPreference.KEY_TINT_ENABLE,
-        LDreamPreference.DEF_TINT_ENABLE)
+    return PreferenceHelper.get(
+        this, LDreamPreference.KEY_TINT_ENABLE,
+        LDreamPreference.DEF_TINT_ENABLE
+    )
 }
 
 fun Context.timerTintColor(): Int {

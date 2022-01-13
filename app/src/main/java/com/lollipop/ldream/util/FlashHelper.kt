@@ -18,9 +18,9 @@ import kotlin.math.min
  * @date 2020-02-17 23:50
  * 闪光的辅助类
  */
-class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
+class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()) :
     ValueAnimator.AnimatorUpdateListener,
-    Animator.AnimatorListener{
+    Animator.AnimatorListener {
 
     private var bindView: View? = null
 
@@ -69,10 +69,11 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         }
     }
 
-    fun bindToBackground(view: View) {
+    fun bindToBackground(view: View?) {
         unbind()
-        view.background = flashDrawable
         bindView = view
+        view ?: return
+        view.background = flashDrawable
         init(view.context)
     }
 
@@ -83,10 +84,11 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         init(view.context)
     }
 
-    fun init(context: Context) {
+    private fun init(context: Context) {
         flashEnable = context.timerFlashEnable()
         flashDrawable.strokeWidth = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 3F, context.resources.displayMetrics)
+            TypedValue.COMPLEX_UNIT_DIP, 3F, context.resources.displayMetrics
+        )
         updateInfo(context)
     }
 
@@ -104,10 +106,12 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
 
     fun postEgg() {
         val o = random.nextBoolean()
-        postFlash(FlashDrawable.makeLocation(0F, true, o),
+        postFlash(
+            FlashDrawable.makeLocation(0F, true, o),
             FlashDrawable.makeLocation(1F, true, !o),
             FlashDrawable.makeLocation(0F, false, !o),
-            FlashDrawable.makeLocation(1F, false, o))
+            FlashDrawable.makeLocation(1F, false, o)
+        )
 
     }
 
@@ -117,8 +121,10 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
             return
         }
         val o = random.nextBoolean()
-        postFlash(FlashDrawable.makeLocation(0F, !isHorizontal, o),
-            FlashDrawable.makeLocation(1F, !isHorizontal, !o))
+        postFlash(
+            FlashDrawable.makeLocation(0F, !isHorizontal, o),
+            FlashDrawable.makeLocation(1F, !isHorizontal, !o)
+        )
 
     }
 
@@ -128,7 +134,8 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
             tasks[i] = FlashDrawable.makeLocation(
                 random.nextFloat().range(0F, 1F),
                 random.nextBoolean(),
-                random.nextBoolean())
+                random.nextBoolean()
+            )
         }
         postFlash(*tasks)
     }
@@ -160,7 +167,7 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()):
         }
     }
 
-    override fun onAnimationRepeat(animation: Animator?) {  }
+    override fun onAnimationRepeat(animation: Animator?) {}
 
     override fun onAnimationEnd(animation: Animator?) {
         lastFlashTime = System.currentTimeMillis()

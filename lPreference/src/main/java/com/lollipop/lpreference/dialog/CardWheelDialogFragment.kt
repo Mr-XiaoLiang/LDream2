@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.StringToColorUtil
 import com.lollipop.lpreference.util.banner.LBannerLayoutManager
@@ -15,13 +16,26 @@ import com.lollipop.lpreference.util.banner.Orientation
 import com.lollipop.lpreference.util.banner.ScrollState
 import com.lollipop.lpreference.util.changeAlpha
 import com.lollipop.lpreference.util.range
-import kotlinx.android.synthetic.main.dialog_card_wheel.*
 
 /**
  * @author lollipop
  * @date 2020-01-21 17:09
  */
-class CardWheelDialogFragment private constructor(): BaseDialog() {
+class CardWheelDialogFragment private constructor() : BaseDialog() {
+
+    companion object {
+        fun show(
+            context: Context, data: List<CardInfo>,
+            selected: Int, tag: String = "CardWheel", listener: OnSelectedListener? = null
+        ) {
+            CardWheelDialogFragment().apply {
+                dataList.clear()
+                dataList.addAll(data)
+                selectedIndex = selected
+                onSelectedListener = listener
+            }.show(context, tag)
+        }
+    }
 
     private var isTouched = false
     private var isViewCreated = false
@@ -34,21 +48,11 @@ class CardWheelDialogFragment private constructor(): BaseDialog() {
 
     private var onSelectedListener: OnSelectedListener? = null
 
-    companion object {
-        fun show(context: Context, data: List<CardInfo>,
-                 selected: Int, tag: String = "CardWheel", listener: OnSelectedListener? = null) {
-            CardWheelDialogFragment().apply {
-                dataList.clear()
-                dataList.addAll(data)
-                selectedIndex = selected
-                onSelectedListener = listener
-            }.show(context, tag)
-        }
-    }
+    private val cardGroup: RecyclerView? by findInSelf()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cardGroup.layoutManager = LBannerLayoutManager().apply {
+        cardGroup?.layoutManager = LBannerLayoutManager().apply {
             orientation = Orientation.HORIZONTAL
             onSelectedChange { position, state ->
                 if (state == ScrollState.DRAGGING) {
@@ -62,11 +66,10 @@ class CardWheelDialogFragment private constructor(): BaseDialog() {
                 }
             }
         }
-        cardGroup.adapter =
-            WheelAdapter(
-                dataList,
-                layoutInflater
-            )
+        cardGroup?.adapter = WheelAdapter(
+            dataList,
+            layoutInflater
+        )
         LinearSnapHelper().attachToRecyclerView(cardGroup)
         isViewCreated = true
     }
@@ -76,7 +79,7 @@ class CardWheelDialogFragment private constructor(): BaseDialog() {
         if (dataList.isEmpty()) {
             return
         }
-        cardGroup.smoothScrollToPosition(selectedIndex.range(0, dataList.size))
+        cardGroup?.smoothScrollToPosition(selectedIndex.range(0, dataList.size))
     }
 
     interface OnSelectedListener {
@@ -87,7 +90,8 @@ class CardWheelDialogFragment private constructor(): BaseDialog() {
 
     private class WheelAdapter(
         private val data: ArrayList<CardInfo>,
-        private val layoutInflater: LayoutInflater): RecyclerView.Adapter<ItemHolder>() {
+        private val layoutInflater: LayoutInflater
+    ) : RecyclerView.Adapter<ItemHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
             return ItemHolder.create(
@@ -106,7 +110,7 @@ class CardWheelDialogFragment private constructor(): BaseDialog() {
 
     }
 
-    private class ItemHolder private constructor(view: View): RecyclerView.ViewHolder(view) {
+    private class ItemHolder private constructor(view: View) : RecyclerView.ViewHolder(view) {
 
         companion object {
             fun create(layoutInflater: LayoutInflater, parent: ViewGroup): ItemHolder {

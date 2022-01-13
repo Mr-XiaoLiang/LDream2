@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import com.lollipop.lpreference.value.ColorArray
 import kotlin.math.min
 
@@ -13,11 +13,14 @@ import kotlin.math.min
  * @date 2020-02-08 20:15
  * 色轮的View
  */
-class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
-    ImageView(context, attrs, defStyleAttr) {
+class ColorWheelView(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
+) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
-    constructor(context: Context):this(context,null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context) : this(context, null)
 
     private val colorWheelDrawable = ColorWheelDrawable()
 
@@ -42,7 +45,7 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             colorWheelDrawable.isGradient = value
         }
 
-    private class ColorWheelDrawable: Drawable() {
+    private class ColorWheelDrawable : Drawable() {
 
         private val paint = Paint().apply {
             isAntiAlias = true
@@ -78,14 +81,18 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             if (colors.size == 1) {
                 paint.color = colors[0]
                 paint.shader = null
-                canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    radius, paint)
+                canvas.drawCircle(
+                    bounds.exactCenterX(), bounds.exactCenterY(),
+                    radius, paint
+                )
                 return
             }
             if (isGradient) {
                 paint.shader = shader
-                canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    radius, paint)
+                canvas.drawCircle(
+                    bounds.exactCenterX(), bounds.exactCenterY(),
+                    radius, paint
+                )
             } else {
                 paint.shader = null
                 val step = 360F / colors.size
@@ -97,8 +104,10 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
         }
 
         private fun drawArc(canvas: Canvas, startAngle: Float, length: Float) {
-            canvas.drawArc(arcRectF,
-                startAngle, length, false, paint)
+            canvas.drawArc(
+                arcRectF,
+                startAngle, length, false, paint
+            )
         }
 
         override fun onBoundsChange(bound: Rect?) {
@@ -121,8 +130,10 @@ class ColorWheelView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             arcRectF.set(left, top, right, bottom)
 
             shader = if (colors.size > 1 && bounds.width() > 0 && bounds.height() > 0) {
-                SweepGradient(bounds.exactCenterX(), bounds.exactCenterY(),
-                    IntArray(colors.size + 1) { colors[it % colors.size] }, null)
+                SweepGradient(
+                    bounds.exactCenterX(), bounds.exactCenterY(),
+                    IntArray(colors.size + 1) { colors[it % colors.size] }, null
+                )
             } else {
                 null
             }

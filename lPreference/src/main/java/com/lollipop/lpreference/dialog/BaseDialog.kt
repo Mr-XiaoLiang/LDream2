@@ -1,6 +1,5 @@
 package com.lollipop.lpreference.dialog
 
-import android.app.Dialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
@@ -8,22 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.isPortrait
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
 
 /**
  * @author lollipop
  * @date 2020-02-04 20:42
  * 基础的Dialog
  */
-abstract class BaseDialog: BottomSheetDialogFragment() {
-
-    abstract val contextId: Int
+abstract class BaseDialog : BottomSheetDialogFragment() {
 
     companion object {
         fun BottomSheetDialogFragment.show(fragment: Fragment, tag: String) {
@@ -46,8 +43,15 @@ abstract class BaseDialog: BottomSheetDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+    abstract val contextId: Int
+
+    private val contentGroup: FrameLayout? by findInSelf()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_base_dialog, container, false)
     }
 
@@ -72,9 +76,9 @@ abstract class BaseDialog: BottomSheetDialogFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.let {
-            it.requestedOrientation = if (context.isPortrait()){
+            it.requestedOrientation = if (context.isPortrait()) {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }else {
+            } else {
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
         }

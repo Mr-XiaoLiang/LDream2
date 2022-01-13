@@ -9,11 +9,14 @@ import android.widget.FrameLayout
  * @date 2020-02-05 20:16
  * 方形的容器
  */
-open class SquareLayout(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
-    : FrameLayout(context,attrs,defStyleAttr) {
+open class SquareLayout(
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
+) : FrameLayout(context, attrs, defStyleAttr) {
 
-    constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
-    constructor(context: Context):this(context,null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context) : this(context, null)
 
     /**
      * 允许主动设定尺寸
@@ -56,8 +59,10 @@ open class SquareLayout(context: Context, attrs: AttributeSet?, defStyleAttr:Int
             // 如果纵向固定，横向不固定，那么横向扩展
             widthSize = heightSize
         }
-        super.onMeasure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY))
+        super.onMeasure(
+            MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY)
+        )
     }
 
 }

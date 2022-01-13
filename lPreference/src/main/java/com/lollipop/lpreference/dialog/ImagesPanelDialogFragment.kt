@@ -11,13 +11,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.base.findInSelf
 import com.lollipop.lpreference.R
 import com.lollipop.lpreference.util.*
 import com.lollipop.lpreference.value.PhotoInfo
 import com.lollipop.lpreference.view.CirclePointView
-import kotlinx.android.synthetic.main.fragment_images_panel.*
 
 /**
  * @author lollipop
@@ -30,8 +32,10 @@ class ImagesPanelDialogFragment : BaseDialog() {
         private const val SPAN_COUNT = 4
         private const val REQUEST_PERMISSION_READ = 233
 
-        fun show(context: Context, selected: ArrayList<Uri>? = null, max: Int = -1,
-                 callback: (Array<Uri>) -> Unit) {
+        fun show(
+            context: Context, selected: ArrayList<Uri>? = null, max: Int = -1,
+            callback: (Array<Uri>) -> Unit
+        ) {
             ImagesPanelDialogFragment().apply {
                 selectedImagesCallback = callback
                 maxSize = max
@@ -53,6 +57,13 @@ class ImagesPanelDialogFragment : BaseDialog() {
 
     private var presetUriList = ArrayList<Uri>()
 
+    private val previewView: ImageView? by findInSelf()
+    private val floatingImageView: CardView? by findInSelf()
+    private val imagesGroup: RecyclerView? by findInSelf()
+    private val statusView: ImageView? by findInSelf()
+    private val closePreviewBtn: ImageView? by findInSelf()
+    private val sizeView: TextView? by findInSelf()
+
     private val adapter: PhotoAdapter by lazy {
         PhotoAdapter(photoAlbumHelper.data, SPAN_COUNT, {
             isItemChecked(it)
@@ -64,7 +75,7 @@ class ImagesPanelDialogFragment : BaseDialog() {
     }
 
     private val scaleImageHelper: ScaleImageHelper by lazy {
-        ScaleImageHelper.with(previewView)
+        ScaleImageHelper.with(previewView!!)
     }
 
     private fun isItemChecked(position: Int): Int {
@@ -72,7 +83,11 @@ class ImagesPanelDialogFragment : BaseDialog() {
         if (index < 0) {
             return 0
         }
-        return if (maxSize == 1) { -1 } else  { index + 1 }
+        return if (maxSize == 1) {
+            -1
+        } else {
+            index + 1
+        }
     }
 
     private fun onItemClick(holder: PhotoHolder): Boolean {
@@ -113,40 +128,47 @@ class ImagesPanelDialogFragment : BaseDialog() {
         if (position < 0 || position >= photoAlbumHelper.data.size) {
             return
         }
-        if (floatingImageView.visibility != View.VISIBLE) {
-            if (floatingImageView.isPortrait()) {
-                floatingImageView.translationX = floatingImageView.width.toFloat()
-                floatingImageView.animate().let { animator ->
-                    animator.cancel()
-                    animator.translationX(0F)
-                    animator.lifecycleBinding {
-                        onStart {
-                            floatingImageView.visibility = View.VISIBLE
-                            removeThis(it)
+        floatingImageView?.apply {
+            if (visibility != View.VISIBLE) {
+                if (isPortrait()) {
+                    translationX = width.toFloat()
+                    animate().let { animator ->
+                        animator.cancel()
+                        animator.translationX(0F)
+                        animator.lifecycleBinding {
+                            onStart {
+                                visibility = View.VISIBLE
+                                removeThis(it)
+                            }
                         }
+                        animator.start()
                     }
-                    animator.start()
+                } else {
+                    visibility = View.VISIBLE
                 }
-            } else {
-                floatingImageView.visibility = View.VISIBLE
             }
         }
         scaleImageHelper.reset()
-        photoAlbumHelper.get(position).loadTo(previewView)
+        previewView?.let {
+            photoAlbumHelper.get(position).loadTo(it)
+        }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        imagesGroup.layoutManager = GridLayoutManager(imagesGroup.context, SPAN_COUNT)
-        imagesGroup.adapter = adapter
+        imagesGroup?.let { group ->
+            group.layoutManager = GridLayoutManager(group.context, SPAN_COUNT)
+            group.adapter = adapter
+        }
         adapter.notifyDataSetChanged()
         photoAlbumHelper.onComplete {
             adapter.notifyDataSetChanged()
             if (photoAlbumHelper.isEmpty) {
-                statusView.visibility = View.VISIBLE
-                statusView.setImageResource(R.drawable.ic_folder_open_black_24dp)
+                statusView?.visibility = View.VISIBLE
+                statusView?.setImageResource(R.drawable.ic_folder_open_black_24dp)
             } else {
-                statusView.visibility = View.INVISIBLE
+                statusView?.visibility = View.INVISIBLE
             }
             photoAlbumHelper.selected.clear()
             photoAlbumHelper.data.forEach { info ->
@@ -161,22 +183,24 @@ class ImagesPanelDialogFragment : BaseDialog() {
 
         photoAlbumHelper.onError {
             adapter.notifyDataSetChanged()
-            statusView.visibility = View.VISIBLE
-            statusView.setImageResource(R.drawable.ic_error_outline_black_24dp)
+            statusView?.visibility = View.VISIBLE
+            statusView?.setImageResource(R.drawable.ic_error_outline_black_24dp)
         }
 
-        closePreviewBtn.setOnClickListener {
-            if (closePreviewBtn.isPortrait()) {
-                floatingImageView.animate().let { animator ->
-                    animator.cancel()
-                    animator.translationX(floatingImageView.width.toFloat())
-                    animator.lifecycleBinding {
-                        onEnd {
-                            floatingImageView.visibility = View.INVISIBLE
-                            removeThis(it)
+        closePreviewBtn?.setOnClickListener {
+            if (closePreviewBtn?.isPortrait() == true) {
+                floatingImageView?.apply {
+                    animate().let { animator ->
+                        animator.cancel()
+                        animator.translationX(width.toFloat())
+                        animator.lifecycleBinding {
+                            onEnd {
+                                visibility = View.INVISIBLE
+                                removeThis(it)
+                            }
                         }
+                        animator.start()
                     }
-                    animator.start()
                 }
             }
         }
@@ -186,18 +210,18 @@ class ImagesPanelDialogFragment : BaseDialog() {
     @SuppressLint("SetTextI18n")
     private fun updateSelectedSize() {
         if (maxSize == 1) {
-            if (sizeView.visibility != View.GONE) {
-                sizeView.visibility = View.GONE
+            if (sizeView?.visibility != View.GONE) {
+                sizeView?.visibility = View.GONE
             }
             return
         }
-        if (sizeView.visibility != View.VISIBLE) {
-            sizeView.visibility = View.VISIBLE
+        if (sizeView?.visibility != View.VISIBLE) {
+            sizeView?.visibility = View.VISIBLE
         }
         if (maxSize < 1) {
-            sizeView.text = photoAlbumHelper.selectedSize.toString()
+            sizeView?.text = photoAlbumHelper.selectedSize.toString()
         } else {
-            sizeView.text = "${photoAlbumHelper.selectedSize}/$maxSize"
+            sizeView?.text = "${photoAlbumHelper.selectedSize}/$maxSize"
         }
     }
 
@@ -216,10 +240,12 @@ class ImagesPanelDialogFragment : BaseDialog() {
         activity?.let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (it.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
                     it.requestPermissions(
                         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        REQUEST_PERMISSION_READ)
+                        REQUEST_PERMISSION_READ
+                    )
                     return
                 }
             }
@@ -227,11 +253,13 @@ class ImagesPanelDialogFragment : BaseDialog() {
         }
     }
 
-    private class PhotoAdapter(private val data: ArrayList<PhotoInfo>,
-                               private val emptyItemSize: Int,
-                               private val isChecked: (Int) -> Int,
-                               private val onClickListener: (PhotoHolder) -> Boolean,
-                               private val onLongClick: (PhotoHolder) -> Unit):
+    private class PhotoAdapter(
+        private val data: ArrayList<PhotoInfo>,
+        private val emptyItemSize: Int,
+        private val isChecked: (Int) -> Int,
+        private val onClickListener: (PhotoHolder) -> Boolean,
+        private val onLongClick: (PhotoHolder) -> Unit
+    ) :
         RecyclerView.Adapter<PhotoHolder>() {
 
         companion object {
@@ -240,9 +268,11 @@ class ImagesPanelDialogFragment : BaseDialog() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
-            return PhotoHolder.create(parent,
+            return PhotoHolder.create(
+                parent,
                 viewType == ITEM_EMPTY,
-                isChecked, onClickListener, onLongClick)
+                isChecked, onClickListener, onLongClick
+            )
         }
 
         override fun getItemCount(): Int {
@@ -250,7 +280,11 @@ class ImagesPanelDialogFragment : BaseDialog() {
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position < data.size) { ITEM_NORMAL } else { ITEM_EMPTY }
+            return if (position < data.size) {
+                ITEM_NORMAL
+            } else {
+                ITEM_EMPTY
+            }
         }
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
@@ -262,19 +296,24 @@ class ImagesPanelDialogFragment : BaseDialog() {
     }
 
     private class PhotoHolder
-        private constructor(private val isEmpty: Boolean,
-                            private val isChecked: (Int) -> Int,
-                            private val onClickListener: (PhotoHolder) -> Boolean,
-                            private val onLongClick: (PhotoHolder) -> Unit,
-                            view: View) :
-            RecyclerView.ViewHolder(view) {
+    private constructor(
+        private val isEmpty: Boolean,
+        private val isChecked: (Int) -> Int,
+        private val onClickListener: (PhotoHolder) -> Boolean,
+        private val onLongClick: (PhotoHolder) -> Unit,
+        view: View
+    ) : RecyclerView.ViewHolder(view) {
         companion object {
-            fun create(group: ViewGroup, isEmpty: Boolean, isChecked: (Int) -> Int,
-                       onClick: (PhotoHolder) -> Boolean,
-                       onLongClick: (PhotoHolder) -> Unit): PhotoHolder {
-                return PhotoHolder(isEmpty, isChecked, onClick, onLongClick,
+            fun create(
+                group: ViewGroup, isEmpty: Boolean, isChecked: (Int) -> Int,
+                onClick: (PhotoHolder) -> Boolean,
+                onLongClick: (PhotoHolder) -> Unit
+            ): PhotoHolder {
+                return PhotoHolder(
+                    isEmpty, isChecked, onClick, onLongClick,
                     LayoutInflater.from(group.context)
-                        .inflate(R.layout.item_image_panel, group, false))
+                        .inflate(R.layout.item_image_panel, group, false)
+                )
             }
         }
 
@@ -285,30 +324,26 @@ class ImagesPanelDialogFragment : BaseDialog() {
                 itemView.setOnClickListener {
                     onItemClick()
                 }
-                itemView.setOnLongClickListener{
+                itemView.setOnLongClickListener {
                     onLongClick(this)
                     true
                 }
             }
         }
 
-        private val imageView: ImageView by lazy {
-            itemView.findViewById<ImageView>(R.id.imageView)
-        }
+        private val imageView: ImageView? by findInSelf()
 
-        private val numberView: CirclePointView by lazy {
-            itemView.findViewById<CirclePointView>(R.id.numberView)
-        }
+        private val numberView: CirclePointView? by findInSelf()
 
-        private val checkedIconView: ImageView by lazy {
-            itemView.findViewById<ImageView>(R.id.checkedIconView)
-        }
+        private val checkedIconView: ImageView? by findInSelf()
 
         fun onBind(info: PhotoInfo) {
             if (isEmpty) {
                 return
             }
-            info.loadTo(imageView)
+            imageView?.let {
+                info.loadTo(it)
+            }
             checkItemStatus(false)
         }
 
@@ -324,22 +359,42 @@ class ImagesPanelDialogFragment : BaseDialog() {
         private fun checkItemStatus(isAnimation: Boolean) {
             val status = isChecked(adapterPosition)
             val checked = status != 0
-            val number = if (status > 0) { status.toString() } else { "" }
+            val number = if (status > 0) {
+                status.toString()
+            } else {
+                ""
+            }
             if (isAnimation) {
                 if (checked) {
-                    numberView.autoText = number
-                    animationChecked(numberView)
-                    if (number.isEmpty()) {
-                        animationChecked(checkedIconView)
+                    numberView?.let {
+                        it.autoText = number
+                        animationChecked(it)
+                    }
+                    checkedIconView?.let {
+                        if (number.isEmpty()) {
+                            animationChecked(it)
+                        }
                     }
                 } else {
-                    animationNotChecked(checkedIconView)
-                    animationNotChecked(numberView)
+                    checkedIconView?.let {
+                        animationNotChecked(it)
+                    }
+                    numberView?.let {
+                        animationNotChecked(it)
+                    }
                 }
             } else {
-                numberView.autoText = number
-                numberView.visibility = if (checked) { View.VISIBLE } else { View.INVISIBLE }
-                checkedIconView.visibility = if (checked && number.isEmpty()) { View.VISIBLE } else { View.INVISIBLE }
+                numberView?.autoText = number
+                numberView?.visibility = if (checked) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
+                checkedIconView?.visibility = if (checked && number.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
             }
         }
 
@@ -376,7 +431,5 @@ class ImagesPanelDialogFragment : BaseDialog() {
                 animator.start()
             }
         }
-
     }
-
 }

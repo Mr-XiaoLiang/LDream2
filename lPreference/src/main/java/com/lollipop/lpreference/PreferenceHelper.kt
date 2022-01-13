@@ -83,7 +83,7 @@ class PreferenceHelper(private val group: RecyclerView) {
             val preference = context.getSharedPreferences(key, Context.MODE_PRIVATE)
             val value = when (def) {
                 is PreferenceValue -> {
-                    def.parse(preference.getString(key, def.serialization())?: def.serialization())
+                    def.parse(preference.getString(key, def.serialization()) ?: def.serialization())
                     def
                 }
                 is String -> {
@@ -105,7 +105,7 @@ class PreferenceHelper(private val group: RecyclerView) {
                     preference.getStringSet(key, def as Set<String>)
                 }
                 else -> def
-            }?:def
+            } ?: def
             return value as T
         }
 
@@ -137,7 +137,7 @@ class PreferenceHelper(private val group: RecyclerView) {
         PreferenceAdapter(data)
     }
 
-    fun onPreferenceChange(listener:  ((BasePreferenceInfo<*>) -> Unit)?) {
+    fun onPreferenceChange(listener: ((BasePreferenceInfo<*>) -> Unit)?) {
         adapter.onPreferenceChangeListener = listener
     }
 

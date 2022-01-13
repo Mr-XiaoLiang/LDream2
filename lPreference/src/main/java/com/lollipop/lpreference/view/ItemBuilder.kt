@@ -2,7 +2,6 @@ package com.lollipop.lpreference.view
 
 import android.content.Intent
 import com.lollipop.lpreference.info.*
-import com.lollipop.lpreference.value.ColorArray
 
 /**
  * @author lollipop
@@ -13,16 +12,26 @@ class ItemBuilder {
 
     val itemList = ArrayList<PreferenceInfo>()
 
-    fun number(key: String, def: Int = 0, run: NumberPreferenceInfo.() -> Unit): NumberPreferenceInfo {
+    fun number(
+        key: String,
+        def: Int = 0,
+        run: NumberPreferenceInfo.() -> Unit
+    ): NumberPreferenceInfo {
         return NumberPreferenceInfo(key, def).apply(run)
     }
 
-    fun action(action: Intent,
-               run: ActionPreferenceInfo.() -> Unit): ActionPreferenceInfo {
+    fun action(
+        action: Intent,
+        run: ActionPreferenceInfo.() -> Unit
+    ): ActionPreferenceInfo {
         return ActionPreferenceInfo(action).apply(run)
     }
 
-    fun switch(key: String, def: Boolean = false, run: SwitchPreferenceInfo.() -> Unit): SwitchPreferenceInfo {
+    fun switch(
+        key: String,
+        def: Boolean = false,
+        run: SwitchPreferenceInfo.() -> Unit
+    ): SwitchPreferenceInfo {
         return SwitchPreferenceInfo(key, def).apply(run)
     }
 
@@ -59,7 +68,7 @@ class ItemBuilder {
         }
     }
 
-    class TempGroupInfo(val title: CharSequence): PreferenceInfo {
+    class TempGroupInfo(val title: CharSequence) : PreferenceInfo {
         val items = ArrayList<PreferenceInfo>()
     }
 

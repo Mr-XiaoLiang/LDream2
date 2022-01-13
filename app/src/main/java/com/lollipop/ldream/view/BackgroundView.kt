@@ -12,11 +12,11 @@ import com.lollipop.ldream.drawer.BlackHoleDrawable
  * @date 2020/3/10 00:56
  * 背景图的ImageView
  */
-class BackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
+class BackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     AppCompatImageView(context, attrs, defStyleAttr) {
 
-    constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
-    constructor(context: Context): this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context) : this(context, null)
 
     private val blackHoleDrawable = BlackHoleDrawable()
 
@@ -34,13 +34,15 @@ class BackgroundView(context: Context, attrs: AttributeSet?, defStyleAttr: Int):
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        blackHoleDrawable.setBounds(paddingLeft, paddingTop,
-            width - paddingRight, height -paddingBottom)
+        blackHoleDrawable.setBounds(
+            paddingLeft, paddingTop,
+            width - paddingRight, height - paddingBottom
+        )
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?:return
+        canvas ?: return
         blackHoleDrawable.draw(canvas)
     }
 

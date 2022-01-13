@@ -3,17 +3,22 @@ package com.lollipop.ldream.activity
 import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.lollipop.ldream.R
+import com.google.android.flexbox.FlexboxLayout
+import com.lollipop.base.findInSelf
+import com.lollipop.ldream.databinding.ActivityMainBinding
 import com.lollipop.ldream.util.*
 import com.lollipop.lpreference.PreferenceHelper
 import com.lollipop.lpreference.util.isPortrait
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_timer.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
+
+    private val binding: ActivityMainBinding by lazyBind()
 
     private lateinit var timerHelper: TimerHelper
     private lateinit var preferenceHelper: PreferenceHelper
@@ -24,21 +29,33 @@ class MainActivity : AppCompatActivity() {
 
     private val random: Random by lazy { Random() }
 
+    private val timerView: TextView? by findInSelf()
+    private val notificationGroup: FlexboxLayout? by findInSelf()
+    private val powerView: TextView? by findInSelf()
+    private val backgroundView: ImageView? by findInSelf()
+    private val flashView: View? by findInSelf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        timerHelper = TimerHelper(timerView, notificationGroup, powerView, backgroundView)
-        preferenceHelper = PreferenceHelper(preferenceList)
-        preferenceList.post {
+        timerHelper = TimerHelper(
+            this,
+            { timerView },
+            { notificationGroup },
+            { powerView },
+            { backgroundView }
+        )
+        preferenceHelper = PreferenceHelper(binding.preferenceList)
+        binding.preferenceList.post {
             initPreference()
         }
 
         flashHelper.bindToBackground(flashView)
         val testFlash = LDreamPreference.registerFlashTest(this) {
             if (random.nextBoolean()) {
-            flashHelper.postDefault(isPortrait())
+                flashHelper.postDefault(isPortrait())
             } else {
                 flashHelper.postRandom(random.nextInt(5) + 1)
             }

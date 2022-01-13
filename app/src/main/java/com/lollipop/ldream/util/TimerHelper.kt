@@ -32,15 +32,20 @@ import kotlin.collections.ArrayList
  * @date 2020-01-12 19:02
  * 时间块的辅助器
  */
-class TimerHelper(private val timeView: TextView,
-                  private val notificationGroup: FlexboxLayout,
-                  private val powerView: TextView,
-                  private val backgroundView: ImageView): BroadcastReceiver() {
+class TimerHelper(
+    private val context: Context,
+    private val timeView: () -> TextView?,
+    private val notificationGroup: () -> FlexboxLayout?,
+    private val powerView: () -> TextView?,
+    private val backgroundView: () -> ImageView?
+) : BroadcastReceiver() {
 
     companion object {
         private const val UPDATE_DELAYED = 400L
-        private const val ACTION_NOTIFICATION_POSTED = NotificationService.ACTION_NOTIFICATION_POSTED
-        private const val ACTION_NOTIFICATION_REMOVED = NotificationService.ACTION_NOTIFICATION_REMOVED
+        private const val ACTION_NOTIFICATION_POSTED =
+            NotificationService.ACTION_NOTIFICATION_POSTED
+        private const val ACTION_NOTIFICATION_REMOVED =
+            NotificationService.ACTION_NOTIFICATION_REMOVED
     }
 
     var specialKeyword = "1"
@@ -59,8 +64,6 @@ class TimerHelper(private val timeView: TextView,
             return notificationList.size
         }
 
-    private val context: Context
-        get() = timeView.context
     private val inflater: LayoutInflater by lazy {
         LayoutInflater.from(context)
     }
@@ -83,14 +86,19 @@ class TimerHelper(private val timeView: TextView,
     private var onNotificationChangeListener: ((Int) -> Unit)? = null
 
     init {
-        timeView.setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
-        powerView.setTypefaceForName("fonts/time_font.otf")
-        specialKeyword = timeView.context.timerKeyWord()
-        specialKeywordColor = timeView.context.timerPrimaryColor()
-        backgroundUri = backgroundView.context.timerBackgroundUri()
-        secondaryTextColor = timeView.context.timerSecondaryColor()
-        isTintIcon = notificationGroup.context.timerTintEnable()
-        iconTintColor = notificationGroup.context.timerTintColor()
+        timeView()?.apply {
+            setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
+        }
+        powerView()?.apply {
+            setTypefaceForName("fonts/time_font.otf")
+        }
+        specialKeyword = context.timerKeyWord()
+        specialKeywordColor = context.timerPrimaryColor()
+        backgroundUri = context.timerBackgroundUri()
+        secondaryTextColor = context.timerSecondaryColor()
+        isTintIcon = context.timerTintEnable()
+        iconTintColor = context.timerTintColor()
+
     }
 
     private val updateTask = Runnable {
@@ -142,7 +150,7 @@ class TimerHelper(private val timeView: TextView,
         calender.timeInMillis = System.currentTimeMillis()
         val hour = calender.get(Calendar.HOUR_OF_DAY).format()
         val minute = calender.get(Calendar.MINUTE).format()
-        timeView.setValue("$hour:$minute")
+        timeView()?.setValue("$hour:$minute")
         if (isRunning) {
             handler.removeCallbacks(updateTask)
             handler.postDelayed(updateTask, UPDATE_DELAYED)
@@ -160,14 +168,16 @@ class TimerHelper(private val timeView: TextView,
         } else {
             "${batteryLevel.format()}%"
         }
-        powerView.setValue(power)
+        powerView()?.setValue(power)
     }
 
     private fun updateBackground() {
-        if (backgroundUri != null) {
-            Glide.with(backgroundView).load(backgroundUri).into(backgroundView)
-        } else {
-            backgroundView.setImageDrawable(null)
+        backgroundView()?.let {
+            if (backgroundUri != null) {
+                Glide.with(it).load(backgroundUri).into(it)
+            } else {
+                it.setImageDrawable(null)
+            }
         }
     }
 
@@ -236,7 +246,7 @@ class TimerHelper(private val timeView: TextView,
         }
         while (notificationViewList.size < notificationList.size) {
             val holder = getIconHolder()
-            notificationGroup.addView(holder.view)
+            notificationGroup()?.addView(holder.view)
             notificationViewList.add(holder)
         }
         while (notificationViewList.size > notificationList.size) {
@@ -257,7 +267,7 @@ class TimerHelper(private val timeView: TextView,
         val newInfo = NotificationService.Info(pkg, icon)
         notificationList.add(newInfo)
         val holder = getIconHolder()
-        notificationGroup.addView(holder.view)
+        notificationGroup()?.addView(holder.view)
         notificationViewList.add(holder)
         holder.onBind(newInfo)
     }
@@ -276,7 +286,7 @@ class TimerHelper(private val timeView: TextView,
             if (pkg == holder.pkg) {
                 notificationViewList.remove(holder)
                 recycleViewList.add(holder)
-                notificationGroup.removeView(holder.view)
+                notificationGroup()?.removeView(holder.view)
                 break
             }
         }
@@ -286,7 +296,7 @@ class TimerHelper(private val timeView: TextView,
         return if (recycleViewList.isNotEmpty()) {
             recycleViewList.removeFirst()
         } else {
-            IconHolder.getInstance(inflater, notificationGroup)
+            IconHolder.getInstance(inflater, notificationGroup())
         }
     }
 
@@ -297,16 +307,16 @@ class TimerHelper(private val timeView: TextView,
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        context?:return
+        context ?: return
         when (intent?.action) {
             ACTION_NOTIFICATION_POSTED -> {
-                val icon = intent.getNotificationIcon()?:return
-                val pkg = intent.getNotificationPkg()?:return
+                val icon = intent.getNotificationIcon() ?: return
+                val pkg = intent.getNotificationPkg() ?: return
                 onNotificationPosted(pkg, icon)
                 onNotificationChangeListener?.invoke(notificationList.size)
             }
             ACTION_NOTIFICATION_REMOVED -> {
-                val pkg = intent.getNotificationPkg()?:return
+                val pkg = intent.getNotificationPkg() ?: return
                 onNotificationRemoved(pkg)
                 onNotificationChangeListener?.invoke(notificationList.size)
             }
@@ -323,10 +333,11 @@ class TimerHelper(private val timeView: TextView,
 
     private class IconHolder private constructor(val view: View) {
         companion object {
-            fun getInstance(inflater: LayoutInflater, viewGroup: ViewGroup): IconHolder {
+            fun getInstance(inflater: LayoutInflater, viewGroup: ViewGroup?): IconHolder {
                 return IconHolder(inflater.inflate(R.layout.notification_icon, viewGroup, false))
             }
         }
+
         private val iconView = view.findViewById<ImageView>(R.id.iconView)
 
         var pkg: String = ""
