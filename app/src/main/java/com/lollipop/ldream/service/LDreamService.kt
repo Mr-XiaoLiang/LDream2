@@ -3,6 +3,7 @@ package com.lollipop.ldream.service
 import android.os.Handler
 import android.service.dreams.DreamService
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.ViewCompat
@@ -107,6 +108,10 @@ class LDreamService : DreamService() {
         ViewCompat.getWindowInsetsController(window.decorView)?.apply {
             hide(WindowInsetsCompat.Type.systemBars())
         }
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+                    or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
     }
 
     private fun doHideAnimation() {
