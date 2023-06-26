@@ -161,24 +161,24 @@ class FlashHelper(private val flashDrawable: FlashDrawable = FlashDrawable()) :
 
     private class FlashTask(val locations: IntArray)
 
-    override fun onAnimationUpdate(animation: ValueAnimator?) {
+    override fun onAnimationUpdate(animation: ValueAnimator) {
         if (animation == animator) {
             flashDrawable.progress = animator.animatedValue as Float
         }
     }
 
-    override fun onAnimationRepeat(animation: Animator?) {}
+    override fun onAnimationRepeat(animation: Animator) {}
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
         lastFlashTime = System.currentTimeMillis()
         flashDrawable.clear()
         startFlash()
     }
 
-    override fun onAnimationCancel(animation: Animator?) {
+    override fun onAnimationCancel(animation: Animator) {
         lastFlashTime = -1
     }
 
-    override fun onAnimationStart(animation: Animator?) {}
+    override fun onAnimationStart(animation: Animator) {}
 
 }

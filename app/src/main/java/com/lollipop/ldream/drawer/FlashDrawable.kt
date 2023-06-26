@@ -133,7 +133,7 @@ class FlashDrawable : Drawable() {
         }
     }
 
-    override fun onBoundsChange(bounds: Rect?) {
+    override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
         notifyDataChange()
     }
