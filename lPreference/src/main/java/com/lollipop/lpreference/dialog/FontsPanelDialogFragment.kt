@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -136,13 +137,16 @@ class FontsPanelDialogFragment : BaseDialog() {
         }
 
         private val fontPreviewView: TextView? by findInSelf()
-
+        private val fontNameView: TextView? by findInSelf()
         private val checkedIconView: ImageView? by findInSelf()
 
         fun bind(info: LFont, isSelected: Boolean) {
-            checkedIconView?.isVisible = isSelected
+            checkedIconView?.isInvisible = !isSelected
             fontPreviewView?.let {
                 info.bind(it)
+            }
+            fontNameView?.let {
+                it.text = info.displayName
             }
         }
 
