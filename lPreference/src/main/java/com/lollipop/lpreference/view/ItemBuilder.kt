@@ -43,6 +43,10 @@ class ItemBuilder {
         return ImagesPreferenceInfo(key).apply(run)
     }
 
+    fun fonts(key: String, def: String, run: FontsPreferenceInfo.() -> Unit): FontsPreferenceInfo {
+        return FontsPreferenceInfo(key, def).apply(run)
+    }
+
     fun group(title: CharSequence, run: ItemBuilder.() -> Unit): TempGroupInfo {
         val tempGroupInfo = TempGroupInfo(title)
         val builder = ItemBuilder()

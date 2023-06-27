@@ -1,3 +1,4 @@
 include ':app', ':lPreference'
 rootProject.name='LDream'
 include ':base'
+include ':fonts'

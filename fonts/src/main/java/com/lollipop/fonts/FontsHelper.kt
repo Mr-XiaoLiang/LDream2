@@ -46,7 +46,7 @@ object FontsHelper {
         }
         val assets = context.assets
         val list = assets.list("fonts") ?: return emptyList()
-        val lFonts = list.map { LFont(displayName = it, assetsName = "font/$it") }
+        val lFonts = list.map { LFont(displayName = it, assetsName = "fonts/$it") }
         fontList.clear()
         fontList.addAll(lFonts)
         lFonts.forEach {

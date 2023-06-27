@@ -35,7 +35,14 @@ object LDreamPreference {
     const val KEY_TINT_ENABLE = "KEY_TINT_ENABLE"
     const val KEY_TINT_COLOR = "KEY_TINT_COLOR"
 
+    const val KEY_TIME_FONT = "KEY_TIME_FONT"
+    const val KEY_POWER_FONT = "KEY_POWER_FONT"
+
     const val DEF_KEYWORD = 1
+
+    const val DEF_TIME_FONT = "fonts/RobotoMono-ThinItalic.ttf"
+
+    const val DEF_POWER_FONT = "fonts/time_font.otf"
 
     val DEF_PRIMARY_COLOR = Color.RED.changeAlpha(0.8F)
 
@@ -86,6 +93,16 @@ object LDreamPreference {
                             title = context.getString(R.string.title_keyword)
                             summary = context.getString(R.string.summary_keyword)
                             iconId = R.drawable.ic_text_fields_black_24dp
+                        },
+                        fonts(KEY_TIME_FONT, DEF_TIME_FONT) {
+                            title = context.getString(R.string.title_time_font)
+                            summary = context.getString(R.string.summary_time_font)
+                            iconId = R.drawable.ic_font_download_24
+                        },
+                        fonts(KEY_POWER_FONT, DEF_POWER_FONT) {
+                            title = context.getString(R.string.title_power_font)
+                            summary = context.getString(R.string.summary_power_font)
+                            iconId = R.drawable.ic_font_download_24
                         },
                         colors(KEY_PRIMARY_COLOR) {
                             title = context.getString(R.string.title_primary_color)
@@ -195,6 +212,22 @@ fun Context.timerKeyWord(): String {
     return PreferenceHelper.get(
         this, LDreamPreference.KEY_KEYWORD,
         LDreamPreference.DEF_KEYWORD
+    ).toString()
+}
+
+fun Context.timeFont(): String {
+    return PreferenceHelper.get(
+        this,
+        LDreamPreference.KEY_TIME_FONT,
+        LDreamPreference.DEF_TIME_FONT
+    ).toString()
+}
+
+fun Context.powerFont(): String {
+    return PreferenceHelper.get(
+        this,
+        LDreamPreference.KEY_POWER_FONT,
+        LDreamPreference.DEF_POWER_FONT
     ).toString()
 }
 

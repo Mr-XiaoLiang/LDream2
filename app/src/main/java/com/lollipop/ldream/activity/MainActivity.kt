@@ -103,6 +103,12 @@ class MainActivity : AppCompatActivity() {
                 timerHelper.iconTintColor = timerTintColor()
                 timerHelper.notifyUpdateIcon()
             }
+            LDreamPreference.KEY_TIME_FONT -> {
+                timerHelper.notifyTimeFontChanged()
+            }
+            LDreamPreference.KEY_POWER_FONT -> {
+                timerHelper.notifyPowerFontChanged()
+            }
         }
     }
 

@@ -31,4 +31,9 @@
     <string name="summary_about">关于应用或开发者</string>
     <string name="title_dream_settings">打开屏保设置</string>
     <string name="summary_dream_settings">前往系统设置，修改屏保应用</string>
+
+    <string name="title_time_font">时间的字体</string>
+    <string name="summary_time_font">时间内容显示时使用的字体</string>
+    <string name="title_power_font">电量的字体</string>
+    <string name="summary_power_font">电量内容显示时使用的字体</string>
 </resources>

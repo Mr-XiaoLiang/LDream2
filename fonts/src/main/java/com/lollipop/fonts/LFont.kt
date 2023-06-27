@@ -10,6 +10,9 @@ class LFont(
 ) {
 
     companion object {
+
+        val EMPTY = LFont("", "")
+
         fun valueOf(assetsName: String): LFont {
             var name = assetsName
             val lastIndexOf = assetsName.lastIndexOf("/")
@@ -21,6 +24,9 @@ class LFont(
     }
 
     fun load(context: Context): Typeface? {
+        if (assetsName.isEmpty()) {
+            return null
+        }
         return FontsHelper.load(context, this)
     }
 

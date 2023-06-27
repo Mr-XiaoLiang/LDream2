@@ -22,6 +22,8 @@ import android.widget.TextView
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexboxLayout
+import com.lollipop.fonts.FontsHelper
+import com.lollipop.fonts.LFont
 import com.lollipop.ldream.R
 import com.lollipop.ldream.service.NotificationService
 import java.util.*
@@ -86,18 +88,15 @@ class TimerHelper(
     private var onNotificationChangeListener: ((Int) -> Unit)? = null
 
     init {
-        timeView()?.apply {
-            setTypefaceForName("fonts/Roboto-ThinItalic.ttf")
-        }
-        powerView()?.apply {
-            setTypefaceForName("fonts/time_font.otf")
-        }
         specialKeyword = context.timerKeyWord()
         specialKeywordColor = context.timerPrimaryColor()
         backgroundUri = context.timerBackgroundUri()
         secondaryTextColor = context.timerSecondaryColor()
         isTintIcon = context.timerTintEnable()
         iconTintColor = context.timerTintColor()
+
+        notifyTimeFontChanged()
+        notifyPowerFontChanged()
 
     }
 
@@ -107,6 +106,22 @@ class TimerHelper(
 
     private fun TextView.setTypefaceForName(name: String) {
         typeface = Typeface.createFromAsset(context.assets, name)
+    }
+
+    fun notifyTimeFontChanged() {
+        timeView()?.let {
+            it.post {
+                FontsHelper.valueOf(context.timeFont()).bind(it)
+            }
+        }
+    }
+
+    fun notifyPowerFontChanged() {
+        powerView()?.let {
+            it.post {
+                FontsHelper.valueOf(context.powerFont()).bind(it)
+            }
+        }
     }
 
     fun onBatteryChange(lis: () -> Unit) {

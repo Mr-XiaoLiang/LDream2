@@ -18,6 +18,7 @@ object PreferenceFactory {
     private const val Switch = 3
     private const val Colors = 4
     private const val Images = 5
+    private const val Fonts = 6
 
     fun getInfoType(info: PreferenceInfo): Int {
         return when (info) {
@@ -27,6 +28,7 @@ object PreferenceFactory {
             is ColorsPreferenceInfo -> Colors
             is ImagesPreferenceInfo -> Images
             is PreferenceGroupInfo -> Group
+            is FontsPreferenceInfo -> Fonts
             else -> Empty
         }
     }
@@ -39,6 +41,7 @@ object PreferenceFactory {
             Colors -> ColorsPreference(group)
             Images -> ImagesPreference(group)
             Group -> PreferenceGroup(group)
+            Fonts -> FontsPreference(group)
             else -> EmptyPreferenceItem(group)
         }
     }
@@ -58,6 +61,9 @@ object PreferenceFactory {
                 item.bind(info)
             }
             is ImagesPreference -> if (info is ImagesPreferenceInfo) {
+                item.bind(info)
+            }
+            is FontsPreference -> if (info is FontsPreferenceInfo) {
                 item.bind(info)
             }
             is PreferenceGroup -> if (info is PreferenceGroupInfo) {

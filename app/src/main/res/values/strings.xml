@@ -31,4 +31,9 @@
     <string name="summary_about">About applications or developers</string>
     <string name="title_dream_settings">Open dream settings</string>
     <string name="summary_dream_settings">Go to system settings and modify the dream application</string>
+
+    <string name="title_time_font">Font for Time</string>
+    <string name="summary_time_font">Font used when displaying time content</string>
+    <string name="title_power_font">Font for batteries</string>
+    <string name="summary_power_font">Font used for displaying battery content</string>
 </resources>
