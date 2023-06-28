@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.flexbox.FlexboxLayout
 import com.lollipop.base.findInSelf
@@ -35,6 +36,14 @@ class MainActivity : AppCompatActivity() {
     private val backgroundView: ImageView? by findInSelf()
     private val flashView: View? by findInSelf()
 
+    private val privacyAgreementLauncher by lazy {
+        registerForActivityResult(PrivacyAgreementActivity.ResultContract()) {
+            if (it != true) {
+                finish()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -61,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         receiverList.add(testFlash)
+
+        privacyAgreementLauncher
     }
 
     private fun initPreference() {
@@ -131,6 +142,13 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         timerHelper.onStop()
         flashHelper.stop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isAgreePrivacyAgreement) {
+            privacyAgreementLauncher.launch(null)
+        }
     }
 
     override fun onDestroy() {

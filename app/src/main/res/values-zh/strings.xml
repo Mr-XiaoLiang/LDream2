@@ -36,4 +36,8 @@
     <string name="summary_time_font">时间内容显示时使用的字体</string>
     <string name="title_power_font">电量的字体</string>
     <string name="summary_power_font">电量内容显示时使用的字体</string>
+
+    <string name="title_privacy_agreement">隐私协议</string>
+    <string name="refuse">拒绝协议</string>
+    <string name="agree">同意协议</string>
 </resources>

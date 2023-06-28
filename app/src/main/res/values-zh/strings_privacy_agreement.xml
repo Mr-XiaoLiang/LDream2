@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_agreement_label1">隐私协议</string>
+    <string name="privacy_agreement_content1">我们非常重视您的隐私，此隐私协议解释了我们收集、使用和保护您的个人信息的方式。</string>
+    <string name="privacy_agreement_label2">收集的信息</string>
+    <string name="privacy_agreement_content2">此应用需要获取文件读取权限和通知监听权限，以便您可以使用其功能。如果这些权限不授予，可能会影响到部分功能的使用。除此之外，我们不会收集、存储或分享您的任何个人信息。\n我们不会收集您的设备标识符、位置信息、日历、联系人、短信、通话记录、相机或麦克风等敏感信息。</string>
+    <string name="privacy_agreement_label3">信息使用</string>
+    <string name="privacy_agreement_content3">此应用不会联网，因此不会将您的任何信息传输到任何地方。我们只会在您使用此应用时，使用您所授予的权限，来提供相应的功能。\n我们不会从您的设备上收集、存储、分享或使用任何个人信息。我们也不会使用任何技术来识别您的个人身份或跟踪您的在线活动。</string>
+    <string name="privacy_agreement_label4">信息保护</string>
+    <string name="privacy_agreement_content4">我们的此应用是开源的，因此您可以随时查看其源代码，以确保我们不会获取您的个人信息。我们会采取合理的安全措施来保护您的个人信息，防止未经授权的访问、使用或泄露。我们会遵守适用的隐私法律法规，并会不时更新本隐私协议。\n如果您对本隐私协议有任何疑问或建议，请随时联系我们。</string>
+    <string name="privacy_agreement_label5">授权</string>
+    <string name="privacy_agreement_content5">此项目可能包含一些商业资源，但此应用并非用于商业盈利目的，因此，如果发现本应用中包含了您或者其他人的未经授权的资源，请及时联系我们。\n如果您不愿意我们使用这些资源，我们将会尽快删除它们。</string>
+    <string name="privacy_agreement_label6">其他</string>
+    <string name="privacy_agreement_content6">我们的此应用可能包含第三方链接，这些链接指向其他网站或服务。我们不对这些第三方网站或服务的隐私惯例负责。我们强烈建议您在访问这些第三方网站或服务之前，仔细阅读他们的隐私政策。\n我们保留在未来可能会对本隐私协议进行更改或更新的权利。如果我们对本隐私协议进行更改或更新，我们将在本页面上发布更新的版本，并在应用程序内提供通知。如果您继续使用我们的此应用，即表示您同意更新后的隐私协议。</string>
+
+</resources>

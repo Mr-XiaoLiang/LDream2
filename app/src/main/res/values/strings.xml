@@ -36,4 +36,8 @@
     <string name="summary_time_font">Font used when displaying time content</string>
     <string name="title_power_font">Font for batteries</string>
     <string name="summary_power_font">Font used for displaying battery content</string>
+
+    <string name="title_privacy_agreement">Privacy Agreement</string>
+    <string name="refuse">Refuse</string>
+    <string name="agree">Agree</string>
 </resources>

@@ -38,6 +38,8 @@ object LDreamPreference {
     const val KEY_TIME_FONT = "KEY_TIME_FONT"
     const val KEY_POWER_FONT = "KEY_POWER_FONT"
 
+    const val KEY_AGREE_PRIVACY_AGREEMENT = "KEY_AGREE_PRIVACY_AGREEMENT"
+
     const val DEF_KEYWORD = 1
 
     const val DEF_TIME_FONT = "fonts/RobotoMono-ThinItalic.ttf"
@@ -237,6 +239,22 @@ fun Context.timerFlashColor(value: ColorArray? = null): ColorArray {
         value ?: LDreamPreference.DEF_FLASH_COLOR.newInstance()
     )
 }
+
+var Context.isAgreePrivacyAgreement: Boolean
+    get() {
+        return PreferenceHelper.get(
+            this,
+            LDreamPreference.KEY_AGREE_PRIVACY_AGREEMENT,
+            false
+        )
+    }
+    set(value) {
+        PreferenceHelper.put(
+            this,
+            LDreamPreference.KEY_AGREE_PRIVACY_AGREEMENT,
+            value
+        )
+    }
 
 fun Context.timerFlashEnable(): Boolean {
     return PreferenceHelper.get(
