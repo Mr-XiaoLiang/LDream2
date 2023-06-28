@@ -9,8 +9,8 @@ android {
         applicationId "liang.lollipop.ldream"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 20903
-        versionName "2.9.3"
+        versionCode 21000
+        versionName "2.10.0"
     }
     buildTypes {
         release {
